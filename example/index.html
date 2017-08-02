@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>meitu-touchkit</title>
+    <link rel="stylesheet" href="./main.css">
+    <script>
+        (function(m, n) {
+            var o = navigator.userAgent,
+                p = /android|adr/gi.test(o),
+                j = /iphone|ipod|ipad/gi.test(o) && !p;
+            var k = n.documentElement;
+            var l = function() {
+                    var a = k.getBoundingClientRect().width || 320;
+                    var b = a / 320 * 20;
+                    b = b > 40 ? 40 : b;
+                    k.style.fontSize = b + "px";
+                    window.fontSize = b
+                },
+                i;
+            m.addEventListener("resize", function() {
+                clearTimeout(i);
+                i = setTimeout(l, 100)
+            }, false);
+            m.addEventListener("pageshow", function(a) {
+                if (a.persisted) {
+                    clearTimeout(i);
+                    i = setTimeout(l, 100)
+                }
+            }, false);
+            l()
+        })(window, document);
+    </script>
+</head>
+<body>
+    <h1 class="title">touchkit.js</h1>
+    <div class="wrap js-wrap">
+        <div class="item sticker">
+            <h2 class="sub-title">贴纸模式</h2>
+            <div class="parent js-par">
+                <!-- <img src="./images/p.jpg" alt="" class="pic js-background"> -->
+                <!-- <div class="el js-el el-ear">
+                    <img src="images/ear.png" class="img" style="width: 100%;height: 100%;" alt="">
+                    <div class="pinch js-pinch"></div>
+                </div> -->
+                <!-- <div class="el js-el el-nose">
+                    <img src="images/nose.png" class="img" style="width: 100%;height: 100%;" alt="">
+                    <div class="pinch js-pinch"></div>
+                </div> -->
+                <!-- <div class="el js-el el-neck el-1">
+                    <img src="images/neck.png" class="img" style="width: 100%;height: 100%;" alt="">
+                    <div class="pinch js-pinch"></div>
+                </div> -->
+            </div>
+        <!-- </div><div class="item crop">
+            <h2 class="sub-title">裁剪模式</h2>
+            <div class="crop-wrap js-crop">
+                <img class="crop-img js-img" src="./images/p2.jpg" alt="" style="height:100%;">
+            </div>
+        </div> -->
+    </div>
+    <div class="btn js-btn Button">
+        合成图片
+    </div>
+    <img style="width:300px;" src="" alt="" class="js-result">
+    <script src="./zepto.min.js"></script>
+    <script src="./dist/example.js"></script>
+</body>
+</html>

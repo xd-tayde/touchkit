@@ -1,0 +1,174 @@
+/* reset */
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, legend, input, button, textarea, p, blockquote, th, td ,header, section, aside, nav, menu, hgroup, audio, video, figure, figcaption, footer, article{ margin:0; padding:0; }
+table { border-collapse:collapse; border-spacing:0; }
+em { font-style:normal; }
+fieldset, img { border:0; vertical-align: bottom;}
+li { list-style:none; }
+caption, th { text-align:left; }
+h1, h2, h3, h4, h5, h6 { font-size:100%;}
+body,input, button, textarea, select {*font-size:100%;outline:none; -webkit-appearance:none; }
+textarea { resize: none; outline:none; }
+i,cite{font-style:normal;}
+a {text-decoration:none; }
+a:focus{outline: none;}
+html{font-size:20px;}
+html,body{-webkit-touch-callout:none;height:100%;}
+.clearfix {  zoom:1; }
+.clearfix:after { content:""; display:block;clear:both;height: 0;visibility: hidden;}
+.hide{display:none} .fr{float:right} .fl{float:left;}.block{display: block;}
+.bold{font-weight: bold;} .center{position:absolute;left: 50%;top: 50%;transform:translate(-50%,-50%);} .auto{margin-left:auto;margin-right:auto}
+
+@media only screen and (max-width: 360px) and (min-width: 321px){
+html{font-size: 22.5px}
+}
+@media only screen and (max-width: 375px) and (min-width: 361px){
+html{font-size: 23.4px}
+}
+@media only screen and (max-width: 390px) and (min-width: 376px){
+html{font-size: 24px;}
+}
+@media only screen and (max-width: 416px) and (min-width: 391px){/*iphone6 plus*/
+html{font-size: 25.9px;}
+}
+
+/**/
+body{font:normal 18px/1.5 'helvetica neue','hiragino sans gb','Microsoft YaHei',arial,tahoma,sans-serif;background-color: #fff;}
+a {
+-webkit-touch-callout: none;
+-webkit-user-select: none;
+-moz-user-select: moz-none;
+-ms-user-select: none;
+user-select: none;
+}
+a,button,input,textarea{-webkit-tap-highlight-color:rgba(255,0,0,0);}
+
+*{
+    padding: 0;
+    margin: 0;
+}
+html,body{
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+.wrap{
+    width: 100%;
+    transition: all .3s;
+    -webkit-transition: all .3s;
+    transform: translateX(0);
+    -webkit-transform: translateX(0);
+}
+.wrap.switch{
+    transform: translateX(-16rem);
+}
+.item{
+    display: inline-block;
+    width: 100%;
+    vertical-align: top;
+    text-align: center;
+}
+.btn{
+    width: 150px;
+    height: 50px;
+    background: #996699;
+    position: fixed;
+    color: white;
+    line-height: 50px;
+    text-align: center;
+    border-radius: 25px;
+    left: 50%;
+    margin-left: -75px;
+    bottom:20px;
+}
+.Button.taped{
+    background: #CC99CC;
+}
+/*.sticker{
+}*/
+
+.title{
+    text-align: center;
+    color: #996699;
+    font-size: 40px;
+    line-height: 60px;
+}
+.parent{
+    display: inline-block;
+    width: 300px;
+    height: 300px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #996699;
+}
+.pic{
+    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+}
+
+.el{
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    transform-origin: 50% 50%;
+    -webkit-transform-origin: 50% 50%;
+    /*border: 1px solid transparent;*/
+    left: 0;
+    top: 0;
+}
+.el-ear{
+    height: 40px;
+    transform: translate3d(5.38rem, 2.27rem, 0px) scale(1.25416) rotate(2.6359deg);
+    -webkit-transform: translate3d(5.38rem, 2.27rem, 0px) scale(1.25416) rotate(2.6359deg);
+}
+.el-nose{
+    height: 83px;
+    transform: translate3d(5.02rem, 4rem, 0px) scale(0.496975) rotate(2.66493deg);
+    -webkit-transform: translate3d(5.02rem, 4rem, 0px) scale(0.496975) rotate(2.66493deg);
+}
+.el-neck{
+    height: 93px;
+    transform: translate3d(4.22rem, 7.16rem, 0px) scale(0.762083) rotate(1.4128deg);
+    -webkit-transform: translate3d(4.22rem, 7.16rem, 0px) scale(0.762083) rotate(1.4128deg);
+}
+
+.pinch{
+    width: 26px;
+    height: 26px;
+    background:url(images/pinch.png) no-repeat 0 0;
+    background-size: 100%;
+    position: absolute;
+    right: -13px;
+    bottom: -13px;
+    display: none;
+}
+
+
+.active .pinch{
+    display: block;
+}
+
+.sub-title{
+    font-size: 24px;
+    line-height: 48px;
+    color: #FF9999;
+    text-align: center;
+}
+
+.crop-wrap{
+    display: inline-block;
+    overflow: hidden;
+    width: 300px;
+    height: 300px;
+
+}
+.mtouch-singleButton{
+    background-image:url(images/pinch.png);
+}
+.mt-close-btn{
+    background-image:url(images/remove.png);
+}
