@@ -13,8 +13,8 @@ let Tk = new Touchkit({
 Tk.background({
     image:'./images/p2.jpg',
     type:'crop',
-});
-Tk.add({
+    // top:150,
+}).add({
     image:`images/ear.png`,
     width:'100px',
     use:{
@@ -32,9 +32,7 @@ Tk.add({
         rotate:2.63,
     },
     close:true,
-});
-
-Tk.add({
+}).add({
     image:`images/neck.png`,
     width:100,
     use:{
@@ -53,12 +51,16 @@ Tk.add({
     },
     close:true,
 });
-// Tk.freeze(true);
 
 $('.js-btn').on('click',function(){
     Tk.exportImage(b64=>{
-        $('.js-result').attr('src',b64);
+        $('.js-result').show();
+        $('.js-result img').attr('src',b64);
     });
+});
+$(window).on('click','.js-result',function(){
+    $('.js-result img').attr('src','');
+    $(this).hide();
 });
 $('.Button').on('touchstart',function(){
     $(this).addClass('taped');

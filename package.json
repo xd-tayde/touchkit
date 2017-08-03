@@ -37,7 +37,7 @@
     "rollup-watch": "^3.2.2"
   },
   "dependencies": {
-    "@meitu/mcanvas": "^1.0.9",
+    "@meitu/mcanvas": "^1.1.3",
     "@meitu/mtouch": "^3.0.3"
   }
 }

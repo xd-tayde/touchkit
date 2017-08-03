@@ -44,8 +44,8 @@ export default {
     getOffset(el){
         el = this.getEl(el);
         let offset = {};
-        offset.width = el.offsetWidth;
-        offset.height = el.offsetHeight;
+        offset.width = el.clientWidth || el.offsetWidth;
+        offset.height = el.clientHeight || el.offsetHeight;
         return offset;
     },
     matrixTo(matrix){
@@ -99,6 +99,7 @@ export default {
                 el.className = _cls + ` ${cls}`;
             }
         }
+        return this;
     },
     trim(str){
         if(typeof str == 'string'){
@@ -124,9 +125,14 @@ export default {
             }
         }
     },
-    data(el,key){
+    data(el,key,value){
         el = this.getEl(el);
-        return el.getAttribute(`data-${key}`);
+        if(!value){
+            return el.getAttribute(`data-${key}`);
+        }else{
+            el.setAttribute(`data-${key}`,value);
+            return this;
+        }
     },
     include(str1,str2){
         if(str1.indexOf){

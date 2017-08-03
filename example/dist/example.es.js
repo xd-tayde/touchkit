@@ -1,6 +1,6 @@
 var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
+var _typeof$1 = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
     return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
 } : function (obj) {
     return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
@@ -8,14 +8,14 @@ var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "sym
 
 var _ = {
     getLength: function getLength(v1) {
-        if ((typeof v1 === 'undefined' ? 'undefined' : _typeof(v1)) !== 'object') {
+        if ((typeof v1 === 'undefined' ? 'undefined' : _typeof$1(v1)) !== 'object') {
             console.error('getLength error!');
             return;
         }
         return Math.sqrt(v1.x * v1.x + v1.y * v1.y);
     },
     getAngle: function getAngle(v1, v2) {
-        if ((typeof v1 === 'undefined' ? 'undefined' : _typeof(v1)) !== 'object' || (typeof v2 === 'undefined' ? 'undefined' : _typeof(v2)) !== 'object') {
+        if ((typeof v1 === 'undefined' ? 'undefined' : _typeof$1(v1)) !== 'object' || (typeof v2 === 'undefined' ? 'undefined' : _typeof$1(v2)) !== 'object') {
             console.error('getAngle error!');
             return;
         }
@@ -49,8 +49,8 @@ var _ = {
     extend: function extend(obj1, obj2) {
         for (var k in obj2) {
             if (obj2.hasOwnProperty(k)) {
-                if (_typeof(obj2[k]) == 'object' && !(obj2[k] instanceof Node)) {
-                    if (_typeof(obj1[k]) !== 'object') {
+                if (_typeof$1(obj2[k]) == 'object' && !(obj2[k] instanceof Node)) {
+                    if (_typeof$1(obj1[k]) !== 'object') {
                         obj1[k] = {};
                     }
                     this.extend(obj1[k], obj2[k]);
@@ -62,7 +62,7 @@ var _ = {
         return obj1;
     },
     getVector: function getVector(p1, p2) {
-        if ((typeof p1 === 'undefined' ? 'undefined' : _typeof(p1)) !== 'object' || (typeof p2 === 'undefined' ? 'undefined' : _typeof(p2)) !== 'object') {
+        if ((typeof p1 === 'undefined' ? 'undefined' : _typeof$1(p1)) !== 'object' || (typeof p2 === 'undefined' ? 'undefined' : _typeof$1(p2)) !== 'object') {
             console.error('getvector error!');
             return;
         }
@@ -524,9 +524,12 @@ MTouch.prototype.off = function (evName, handler) {
     this[evName].del(handler);
 };
 
+
+//# sourceMappingURL=mtouch.es.js.map
+
 var _typeof2$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _typeof$1 = typeof Symbol === "function" && _typeof2$1(Symbol.iterator) === "symbol" ? function (obj) {
+var _typeof$2 = typeof Symbol === "function" && _typeof2$1(Symbol.iterator) === "symbol" ? function (obj) {
     return typeof obj === "undefined" ? "undefined" : _typeof2$1(obj);
 } : function (obj) {
     return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2$1(obj);
@@ -536,8 +539,8 @@ var _$1 = {
     extend: function extend(obj1, obj2) {
         for (var k in obj2) {
             if (obj2.hasOwnProperty(k)) {
-                if (_typeof$1(obj2[k]) == 'object') {
-                    if (_typeof$1(obj1[k]) !== 'object' || obj1[k] === null) {
+                if (_typeof$2(obj2[k]) == 'object') {
+                    if (_typeof$2(obj1[k]) !== 'object' || obj1[k] === null) {
                         obj1[k] = {};
                     }
                     this.extend(obj1[k], obj2[k]);
@@ -571,7 +574,7 @@ var _$1 = {
             }, function (err) {
                 console.log(err);
             });
-        } else if ((typeof image === 'undefined' ? 'undefined' : _typeof$1(image)) == 'object') {
+        } else if ((typeof image === 'undefined' ? 'undefined' : _typeof$2(image)) == 'object') {
             cbk(image);
         } else {
             console.log('add image error');
@@ -709,7 +712,7 @@ MCanvas.prototype._background = function (img, bg) {
             dheight = this.canvas.height;
             break;
         default:
-            console.err('background type error!');
+            console.error('background type error!');
     }
     this.ctx.drawImage(img, sx, sy, swidth, sheight, dx, dy, dwidth, dheight);
     this._next();
@@ -827,18 +830,17 @@ MCanvas.prototype._add = function (img, ops) {
         ldy = void 0,
         ldw = void 0,
         ldh = void 0;
-    //  素材的真实宽高，用于剔除避免裁剪所添加的空白区域；
-    var rw = void 0,
-        rh = void 0,
-        rspaceX = void 0,
-        rspaceY = void 0;
-
     // 素材canvas的绘制;
     var lcvs = document.createElement('canvas');
     var lctx = lcvs.getContext('2d');
+    // 图片宽高比 * 1.4 是一个最安全的宽度，旋转任意角度都不会被裁剪；
+    // 没有旋转却长宽比很高大的图，会导致放大倍数太大，因此甚至了最高倍数为5；
+    var lctxScale = ratio * 1.4 > 5 ? 5 : ratio * 1.4;
+    var spaceX = void 0,
+        spaceY = void 0;
 
-    // 取最长边为边长，正方形,避免旋转的时候被裁剪；
-    lcvs.height = lcvs.width = ratio > 1 ? img.naturalWidth : img.naturalHeight;
+    lcvs.width = img.naturalWidth * lctxScale;
+    lcvs.height = img.naturalHeight * lctxScale;
 
     // 从素材canvas的中心点开始绘制；
     ldx = -img.naturalWidth / 2;
@@ -849,41 +851,32 @@ MCanvas.prototype._add = function (img, ops) {
     lctx.translate(lcvs.width / 2, lcvs.height / 2);
     lctx.rotate(ops.pos.rotate);
     lctx.drawImage(img, lsx, lsy, lsw, lsh, ldx, ldy, ldw, ldh);
-
+    //
     // lcvs.style = 'width:300px';
     // document.querySelector('body').appendChild(lcvs);
 
     // 获取素材最终的宽高;
-    // 由于前面的素材canvas已经绘制成正方形，所以 w = h;
-    cdh = cdw = ops.width;
+    cdw = ops.width * lctxScale;
+    cdh = cdw / ratio;
 
-    // 计算绘制成正方形造成的空白区域；
-    if (ratio > 1) {
-        rh = cdw / ratio;
-        rw = 0;
-        rspaceX = 0;
-        rspaceY = (cdh - rh) / 2;
-    } else {
-        rw = cdh * ratio;
-        rh = 0;
-        rspaceX = (cdw - rw) / 2;
-        rspaceY = 0;
-    }
+    spaceX = (lctxScale - 1) * ops.width / 2;
+    spaceY = spaceX / ratio;
 
     // 获取素材的位置；
     //    配置的位置 - 缩放的影响 - 绘制成正方形的影响；
-    cdx = ops.pos.x + cdw * (1 - ops.pos.scale) / 2 - rspaceX;
-    cdy = ops.pos.y + cdh * (1 - ops.pos.scale) / 2 - rspaceY;
+    cdx = ops.pos.x + cdw * (1 - ops.pos.scale) / 2 - spaceX;
+    cdy = ops.pos.y + cdh * (1 - ops.pos.scale) / 2 - spaceY;
 
-    // 计算配置的缩放值；
-    cdh = cdw *= ops.pos.scale;
+    cdw *= ops.pos.scale;
+    cdh *= ops.pos.scale;
 
     this.ctx.drawImage(lcvs, cdx, cdy, cdw, cdh);
+
+    lcvs = lctx = null;
     this._next();
 };
 // 参数加工函数；
 MCanvas.prototype._handleOps = function (ops, img) {
-
     var cw = this.canvas.width,
         ch = this.canvas.height,
         iw = img.naturalWidth,
@@ -1180,7 +1173,10 @@ MCanvas.prototype._next = function () {
     }
 };
 
-var _typeof$2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+//# sourceMappingURL=mcanvas.es.js.map
+
+var _typeof$3 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var sheet = void 0;
 var _$2 = {
@@ -1213,8 +1209,8 @@ var _$2 = {
     extend: function extend(obj1, obj2) {
         for (var k in obj2) {
             if (obj2.hasOwnProperty(k)) {
-                if (_typeof$2(obj2[k]) == 'object' && !(obj2[k] instanceof Node)) {
-                    if (_typeof$2(obj1[k]) !== 'object' || obj1[k] === null) {
+                if (_typeof$3(obj2[k]) == 'object' && !(obj2[k] instanceof Node)) {
+                    if (_typeof$3(obj1[k]) !== 'object' || obj1[k] === null) {
                         obj1[k] = {};
                     }
                     this.extend(obj1[k], obj2[k]);
@@ -1228,8 +1224,8 @@ var _$2 = {
     getOffset: function getOffset(el) {
         el = this.getEl(el);
         var offset = {};
-        offset.width = el.offsetWidth;
-        offset.height = el.offsetHeight;
+        offset.width = el.clientWidth || el.offsetWidth;
+        offset.height = el.clientHeight || el.offsetHeight;
         return offset;
     },
     matrixTo: function matrixTo(matrix) {
@@ -1283,6 +1279,7 @@ var _$2 = {
                 el.className = _cls + (' ' + cls);
             }
         }
+        return this;
     },
     trim: function trim(str) {
         if (typeof str == 'string') {
@@ -1308,9 +1305,14 @@ var _$2 = {
             }
         }
     },
-    data: function data(el, key) {
+    data: function data(el, key, value) {
         el = this.getEl(el);
-        return el.getAttribute('data-' + key);
+        if (!value) {
+            return el.getAttribute('data-' + key);
+        } else {
+            el.setAttribute('data-' + key, value);
+            return this;
+        }
     },
     include: function include(str1, str2) {
         if (str1.indexOf) {
@@ -1385,7 +1387,7 @@ var _$2 = {
             }, function (err) {
                 console.log(err);
             });
-        } else if ((typeof image === 'undefined' ? 'undefined' : _typeof$2(image)) == 'object' && image instanceof Node) {
+        } else if ((typeof image === 'undefined' ? 'undefined' : _typeof$3(image)) == 'object' && image instanceof Node) {
             cbk(image);
         } else {
             console.log('add image error');
@@ -1470,6 +1472,8 @@ var ZIndex = function () {
     return ZIndex;
 }();
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var EVENT = ['touchstart', 'touchmove', 'touchend', 'drag', 'dragstart', 'dragend', 'pinch', 'pinchstart', 'pinchend', 'rotate', 'rotatestart', 'rotatend', 'singlePinchstart', 'singlePinch', 'singlePinchend', 'singleRotate', 'singleRotatestart', 'singleRotatend'];
 
 window.requestAnimFrame = function () {
@@ -1507,49 +1511,42 @@ function Touchkit(ops) {
         }
     };
 
-    if (ops.event || ops.el) {
+    if ((typeof ops === 'undefined' ? 'undefined' : _typeof(ops)) == 'object') {
         this._ops = _$2.extend(this._ops, ops);
-    } else {
-        this._ops.el = _$2.getEl(ops);
+    } else if (typeof ops == 'string') {
+        this._ops.el = ops;
     }
 
     // 手势容器；
     this.el = _$2.getEl(this._ops.el);
-
+    // 容器宽高，优先使用clientWidth，避免边框等因素的影响；
     this.elStatus = {
         width: this.el.clientWidth || this.el.offsetWidth,
         height: this.el.clientHeight || this.el.offsetHeight
     };
+    this._init();
 
-    this.operator = null;
-
-    this.operatorStatus = null;
-
-    this.transform = null;
-
-    this.freezed = false;
-
-    this._childs = {};
-
-    this._childIndex = 0;
-
-    this._zIndexBox = new ZIndex();
-
+    // 初始化mtouch；
     this.mt = MTouch(this.el);
 
     this._bind();
 
-    this.insertCss();
+    this._insertCss();
 }
 
-Touchkit.prototype.insertCss = function () {
-    _$2.addCssRule('.mtouch-singleButton', 'display: none;');
-    _$2.addCssRule('.mt-active', 'z-index: 99;outline:2px solid hsla(0,0%,100%,.5);');
-    _$2.addCssRule('.mt-active .mtouch-singleButton,.mt-active .mt-close-btn', 'display: inline-block;');
-    _$2.addCssRule('.mt-child', 'position:absolute;text-align:left;');
-    _$2.addCssRule('.mt-image', 'width:100%;height:100%;position:absolute;text-align:left;');
-    _$2.addCssRule('.mt-close-btn', 'position:absolute;width:30px;height:30px;top:-15px;right:-15px;background-size:100%;display:none;');
-    _$2.addCssRule('.mt-background', 'position:absolute;left:0;top:0;');
+Touchkit.prototype._init = function () {
+    // 操作元素
+    this.operator = null;
+    this.operatorStatus = null;
+
+    this.transform = null;
+    this.freezed = false;
+    // 子元素仓库，index用于标记子元素；
+    this._childs = {};
+    this._childIndex = 0;
+    this._activeChild = null;
+    // 管理子元素之间的zindex层级关系；
+    this._zIndexBox = new ZIndex();
 };
 
 Touchkit.prototype.background = function (ops) {
@@ -1558,27 +1555,29 @@ Touchkit.prototype.background = function (ops) {
     var _ops = {
         // 背景图片，type: url/HTMLImageElement/HTMLCanvasElement
         image: '',
-        // 绘制方式: origin / crop / contain
-        // crop : 裁剪模式，背景图自适应铺满画布，多余部分裁剪；可通过 left/top值控制裁剪部分；
+        // 绘制方式: crop / contain
+        // crop : 裁剪模式，背景图自适应铺满画布，多余部分裁剪；
         // contain : 包含模式, 类似于 background-size:contain; 可通过left/top值进行位置的控制；
         type: 'contain',
         // 背景图片距离画布左上角的距离，
         left: 0,
         top: 0,
-        // 除了背景图外的颜色，仅在 type:contain时可见；
-        color: '#000000',
+        // 在type=crop时使用，背景图只需启动拖动操作；
         use: {
             drag: true
         }
     };
     _ops = _$2.extend(_ops, ops);
     _$2.getImage(_ops.image, function (img) {
+        // 背景图真实宽高及宽高比；
         var iw = img.naturalWidth,
             ih = img.naturalHeight,
             iratio = iw / ih;
+        // 容器宽高及宽高比；
         var pw = _this.elStatus.width,
             ph = _this.elStatus.height,
             pratio = pw / ph;
+
         var left = void 0,
             top = void 0,
             width = void 0,
@@ -1587,9 +1586,8 @@ Touchkit.prototype.background = function (ops) {
             minY = 0;
         var ratio = void 0;
 
-        _$2.addClass(img, 'mt-background');
-        img.setAttribute('data-mt-index', 'background');
-        img.setAttribute('data-mt-bg-type', _ops.type);
+        // 初始化背景图属性；
+        _$2.addClass(img, 'mt-background').data(img, 'mt-index', 'background').data(img, 'mt-bg-type', _ops.type);
 
         if (_ops.type == 'contain') {
             if (iratio > pratio) {
@@ -1627,14 +1625,19 @@ Touchkit.prototype.background = function (ops) {
             };
         }
         img.style = 'width:' + width + 'px;height:' + height + 'px;left:' + left + 'px;top:' + top + 'px';
-        _this.el.setAttribute('data-mt-ratio', ratio);
         _this.el.appendChild(img);
+
+        // 记录背景图参数；
+        _ops.ratio = ratio;
+        _ops.left = left;
+        _ops.top = top;
 
         _this._childs.background = {
             el: img,
             ops: _ops
         };
     });
+    return this;
 };
 
 Touchkit.prototype.add = function (ops) {
@@ -1643,7 +1646,6 @@ Touchkit.prototype.add = function (ops) {
     var _ops = {
         image: '',
         width: '',
-        height: '',
         use: {
             drag: false,
             pinch: false,
@@ -1666,41 +1668,90 @@ Touchkit.prototype.add = function (ops) {
             ih = img.naturalHeight,
             iratio = iw / ih;
         var _templateEl = img;
-        _$2.addClass(_templateEl, 'mt-image');
         var _ele = _$2.domify('<div class="mt-child" id="mt-child-' + _this2._childIndex + '" data-mt-index="' + _this2._childIndex + '"></div>')[0];
-        var originWidth = _this2._get('width', _ops.width);
-        var originHeight = originWidth / iratio;
-        var spaceX = (_ops.pos.scale - 1) * originWidth / 2;
-        var spaceY = (_ops.pos.scale - 1) * originHeight / 2;
-        _ele.style.width = originWidth + 'px';
-        _ele.style.height = originHeight + 'px';
+        var originWidth = _this2._get('hor', _ops.width),
+            originHeight = originWidth / iratio;
+        var spaceX = (_ops.pos.scale - 1) * originWidth / 2,
+            spaceY = (_ops.pos.scale - 1) * originHeight / 2;
+        _ele.style = 'width:' + originWidth + 'px;height:' + originHeight + 'px';
+        _$2.addClass(_templateEl, 'mt-image');
         _ele.appendChild(_templateEl);
-
+        // 是否添加关闭按钮；
         if (_ops.close) {
-            var _closeBtnEl = _$2.domify('<div class="mt-close-btn"></div>')[0];
-            _ele.appendChild(_closeBtnEl);
+            _ele.appendChild(_$2.domify('<div class="mt-close-btn"></div>')[0]);
         }
         _this2.el.appendChild(_ele);
+        // 记录数据；
         _this2._childs[_this2._childIndex] = {
             el: _ele,
             ops: _ops
         };
+        // 根据id进行zIndex的设置；
         _this2._zIndexBox.setIndex('mt-child-' + _this2._childIndex);
+
+        // 没有开启单指操作时，不添加单指按钮；
         var addButton = _ops.use.singlePinch || _ops.use.singleRotate ? true : false;
+        // 切换operator到新添加的元素上；
         _this2.switch(_ele, addButton);
-        _this2.setTransform(_ele, {
-            x: _this2._get('width', _ops.pos.x) + spaceX,
-            y: _this2._get('height', _ops.pos.y) + spaceY,
+
+        // space 为因为缩放造成的偏移误差；
+        _this2._setTransform(_ele, {
+            x: _this2._get('hor', _ops.pos.x) + spaceX,
+            y: _this2._get('ver', _ops.pos.y) + spaceY,
             scale: _ops.pos.scale,
             rotate: _ops.pos.rotate
         });
         _this2._childIndex++;
+    });
+    return this;
+};
+// 使用 mcanvas 合成图片后导出 base64;
+Touchkit.prototype.exportImage = function (cbk) {
+    var cwidth = this.elStatus.width,
+        cheight = this.elStatus.height;
+    var bg = this._childs.background;
+    var bgLeft = void 0,
+        bgTop = void 0;
+    var ratio = bg.ops.ratio;
+    var mc = new MCanvas(cwidth * ratio, cheight * ratio);
+    var addChilds = [];
+    this._zIndexBox.zIndexArr.forEach(function (v) {
+        var child = document.querySelector('#' + v);
+        var image = child.querySelector('.mt-image');
+        var childPos = JSON.parse(_$2.data(child, 'mtouch-status'));
+        var width = image.clientWidth || image.offsetWidth;
+        childPos.x *= ratio;
+        childPos.y *= ratio;
+        addChilds.push({
+            image: image,
+            options: {
+                width: width * ratio,
+                pos: childPos
+            }
+        });
+    });
+    if (bg.ops.type == 'crop') {
+        var bgPos = JSON.parse(_$2.data(bg.el, 'mtouch-status')) || { left: 0, top: 0, scale: 1, rotate: 0 };
+        bgLeft = -bgPos.x;
+        bgTop = -bgPos.y;
+    } else {
+        bgLeft = bg.ops.left;
+        bgTop = bg.ops.top;
+    }
+    mc.background({
+        image: bg.el,
+        type: bg.ops.type,
+        left: bgLeft * ratio,
+        top: bgTop * ratio
+    }).add(addChilds).draw(function (b64) {
+        cbk(b64);
     });
 };
 
 Touchkit.prototype._bind = function () {
     var _this3 = this;
 
+    // 绑定所有事件；
     EVENT.forEach(function (evName) {
         if (!_this3[evName]) {
             _this3[evName] = function () {
@@ -1710,93 +1761,107 @@ Touchkit.prototype._bind = function () {
         _this3.mt.on(evName, _this3[evName].bind(_this3));
     });
 
+    // 点击子元素外的区域失去焦点；
     this.el.addEventListener('click', function (ev) {
-        if (!_this3.isAdd(ev.target)) {
+        if (!_this3._isAdd(ev.target)) {
             _this3.switch(null);
         }
+        // 如果背景为裁剪模式，则切换到操作背景图；
         if (_$2.hasClass(ev.target, 'mt-background') && _$2.data(ev.target, 'mt-bg-type') == 'crop') {
-            _this3.operator = ev.target;
-            _this3.operatorStatus = _this3.operator ? _this3.operator.getBoundingClientRect() : {};
+            _this3.switch(ev.target);
         }
     });
 
+    // 切换子元素；
     _$2.delegate(this.el, 'click', '.mt-child', function (ev) {
-        var el = ev.delegateTarget;
-        var _ops = _this3._getOperatorOps(el);
-        var _addButton = _ops.use.singlePinch || _ops.use.singleRotate ? true : false;
+        var el = ev.delegateTarget,
+            _ops = _this3._getOperatorOps(el),
+            _addButton = _ops.use.singlePinch || _ops.use.singleRotate ? true : false;
         _this3.switch(el, _addButton);
         _this3._zIndexBox.toTop(el.id);
     });
 
+    // 关闭按钮事件；
     _$2.delegate(this.el, 'click', '.mt-close-btn', function (ev) {
         var _el = ev.delegateTarget;
         var _child = _el.parentNode || _el.parentElement;
-        var id = _child.getAttribute('id') || '';
-        _this3._zIndexBox.removeIndex(id);
+        _this3._zIndexBox.removeIndex(_child.id);
         _$2.remove(_child);
     });
 };
 
 Touchkit.prototype.touchstart = function (ev) {
-    if (this.operator) {
-        this.transform = _$2.getPos(this.operator);
+    if (!this.freezed) {
+        if (this.operator) {
+            this.transform = _$2.getPos(this.operator);
+        }
+        this._ops.event.touchstart(ev);
     }
-    this._ops.event.touchstart(ev);
 };
 
 Touchkit.prototype.drag = function (ev) {
-    if (this.operator && !this.freezed) {
-        var ops = this._getOperatorOps();
-        if (ops.use.drag) {
-            this.transform.x += ev.delta.deltaX;
-            this.transform.y += ev.delta.deltaY;
-            this.setTransform();
+    if (!this.freezed) {
+        if (this.operator) {
+            var ops = this._getOperatorOps();
+            if (ops.use.drag) {
+                this.transform.x += ev.delta.deltaX;
+                this.transform.y += ev.delta.deltaY;
+                this._setTransform();
+            }
         }
+        this._ops.event.drag(ev);
     }
-    this._ops.event.drag(ev);
 };
 
 Touchkit.prototype.pinch = function (ev) {
-    if (this.operator && !this.freezed) {
-        var ops = this._getOperatorOps();
-        if (ops.use.pinch) {
-            this.transform.scale *= ev.delta.scale;
-            this.setTransform();
+    if (!this.freezed) {
+        if (this.operator) {
+            var ops = this._getOperatorOps();
+            if (ops.use.pinch) {
+                this.transform.scale *= ev.delta.scale;
+                this._setTransform();
+            }
         }
+        this._ops.event.pinch(ev);
     }
-    this._ops.event.pinch(ev);
 };
 Touchkit.prototype.rotate = function (ev) {
-    if (this.operator && !this.freezed) {
-        var ops = this._getOperatorOps();
-        if (ops.use.rotate) {
-            this.transform.rotate += ev.delta.rotate;
-            this.setTransform();
+    if (!this.freezed) {
+        if (this.operator) {
+            var ops = this._getOperatorOps();
+            if (ops.use.rotate) {
+                this.transform.rotate += ev.delta.rotate;
+                this._setTransform();
+            }
         }
+        this._ops.event.rotate(ev);
     }
-    this._ops.event.rotate(ev);
 };
 Touchkit.prototype.singlePinch = function (ev) {
-    if (this.operator && !this.freezed) {
-        var ops = this._getOperatorOps();
-        if (ops.use.singlePinch) {
-            this.transform.scale *= ev.delta.scale;
-            this.setTransform();
+    if (!this.freezed) {
+        if (this.operator) {
+            var ops = this._getOperatorOps();
+            if (ops.use.singlePinch) {
+                this.transform.scale *= ev.delta.scale;
+                this._setTransform();
+            }
         }
+        this._ops.event.singlePinch(ev);
     }
-    this._ops.event.singlePinch(ev);
 };
 Touchkit.prototype.singleRotate = function (ev) {
-    if (this.operator && !this.freezed) {
-        var ops = this._getOperatorOps();
-        if (ops.use.singleRotate) {
-            this.transform.rotate += ev.delta.rotate;
-            this.setTransform();
+    if (!this.freezed) {
+        if (this.operator) {
+            var ops = this._getOperatorOps();
+            if (ops.use.singleRotate) {
+                this.transform.rotate += ev.delta.rotate;
+                this._setTransform();
+            }
         }
+        this._ops.event.singleRotate(ev);
     }
-    this._ops.event.singleRotate(ev);
 };
-Touchkit.prototype.setTransform = function () {
+Touchkit.prototype._setTransform = function () {
     var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.operator;
     var transform = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.transform;
 
@@ -1810,7 +1875,7 @@ Touchkit.prototype.setTransform = function () {
     };
     var _limit = ops.limit && ops.limit !== true ? _$2.extend(defaulLimit, ops.limit) : defaulLimit;
     if (ops.limit) {
-        trans = this.limitOperator(trans, _limit);
+        trans = this._limitOperator(trans, _limit);
     }
     // 当 isHold 参数开启时，反向设置按钮的scale值，使按钮大小保持不变；
     if (ops.use.singlePinch) {
@@ -1825,14 +1890,14 @@ Touchkit.prototype.setTransform = function () {
     }
     if (ops.close) {
         var closeBtn = el.querySelector('.mt-close-btn');
-        closeBtn.style.webkitTransform = 'scale(' + 1 / trans.scale + ')';
+        closeBtn.style.transform = 'scale(' + 1 / trans.scale + ')';
         closeBtn.style.webkitTransform = 'scale(' + 1 / trans.scale + ')';
     }
     window.requestAnimFrame(function () {
         _$2.setPos(el, trans);
     });
 };
-Touchkit.prototype.limitOperator = function (transform, limit) {
+Touchkit.prototype._limitOperator = function (transform, limit) {
     // 实时获取操作元素的状态；
     var minScale = limit.minScale,
         maxScale = limit.maxScale;
@@ -1867,31 +1932,60 @@ Touchkit.prototype.limitOperator = function (transform, limit) {
     return transform;
 };
 Touchkit.prototype.switch = function (el, addButton) {
-    el = typeof el == 'string' ? document.querySelector(el) : el;
+    if (!this.mt || this.freezed) return;
+    if (el) {
+        el = _$2.getEl(el);
+    }
     _$2.forin(this._childs, function (k, v) {
         _$2.removeClass(v.el, 'mt-active');
     });
     // 转换操作元素后，也需要重置 mtouch 中的单指缩放基本点 singleBasePoint;
-    this.mt && this.mt.switch(el, addButton);
+    this.mt.switch(el, addButton);
+    // 切换operator;
     this.operator = el;
-    this.operatorStatus = this.operator ? this.operator.getBoundingClientRect() : {};
+
     if (el) {
         _$2.addClass(el, 'mt-active');
+        this._activeChild = el;
     }
     return this;
 };
+
 Touchkit.prototype._getOperatorOps = function (target) {
     var _tar = target || this.operator;
     var index = _$2.data(_tar, 'mt-index');
     return this._childs[index].ops;
 };
+
+// 冻结手势容器，暂停所有操作，且失去焦点；
+// 解冻后恢复最后状态；
 Touchkit.prototype.freeze = function (boolean) {
+    if (boolean) {
+        _$2.forin(this._childs, function (k, v) {
+            _$2.removeClass(v.el, 'mt-active');
+        });
+    } else {
+        _$2.addClass(this._activeChild, 'mt-active');
+    }
     this.freezed = boolean ? true : false;
     return this;
 };
+
+// 重置所有状态到初始化阶段；
+Touchkit.prototype.reset = function () {
+    _$2.forin(this._childs, function (k, v) {
+        _$2.remove(v.el);
+    });
+    this._init();
+};
+
+// 销毁，但保持原有样式，失去焦点与事件绑定；
 Touchkit.prototype.destory = function () {
-    this.mtouch && this.mtouch.destroy();
-    this.mtouch = null;
+    _$2.forin(this._childs, function (k, v) {
+        _$2.removeClass(v.el, 'mt-active');
+    });
+    this.mt && this.mt.destroy();
+    this.mt = null;
 };
 // 参数加工函数；
 // 兼容 5 种 value 值：
@@ -1899,9 +1993,16 @@ Touchkit.prototype.destory = function () {
 // width:100,width:'100px',width:'100%'
 Touchkit.prototype._get = function (drection, str) {
     var result = str;
-    var k = drection == 'width' ? 'offsetWidth' : 'offsetHeight';
-    var par = this.el[k],
-        child = this.operator ? this.operator[k] : 0;
+    var k = void 0,
+        par = void 0,
+        child = void 0;
+    if (document.body && document.body.clientWidth) {
+        k = drection == 'hor' ? 'clientWidth' : 'clientHeight';
+    } else {
+        k = drection == 'hor' ? 'offsetWidth' : 'offsetHeight';
+    }
+    par = this.el[k];
+    child = this.operator ? this.operator[k] : 0;
     if (typeof str === 'string') {
         if (_$2.include(str, ':')) {
             var arr = str.split(':');
@@ -1916,9 +2017,9 @@ Touchkit.prototype._get = function (drection, str) {
                     break;
                 default:
             }
-        } else if (str.indexOf('px') !== -1) {
+        } else if (_$2.include(str, 'px')) {
             result = +str.replace('px', '');
-        } else if (str.indexOf('%') !== -1) {
+        } else if (_$2.include(str, '%')) {
             result = par * +str.replace('%', '') / 100;
         } else if (str == 'center') {
             result = (par - child) / 2;
@@ -1929,7 +2030,7 @@ Touchkit.prototype._get = function (drection, str) {
     return result;
 };
 
-Touchkit.prototype.isAdd = function (el) {
+Touchkit.prototype._isAdd = function (el) {
     var target = el;
     while (target !== this.el || target.tagName.toLowerCase() == 'body') {
         if (_$2.include(target.className, 'mt-child')) {
@@ -1940,46 +2041,14 @@ Touchkit.prototype.isAdd = function (el) {
     return false;
 };
 
-Touchkit.prototype.exportImage = function (cbk) {
-    var cwidth = this.elStatus.width,
-        cheight = this.elStatus.height;
-    var ratio = +_$2.data(this.el, 'mt-ratio');
-    var mc = new MCanvas(cwidth * ratio, cheight * ratio);
-    var bg = this._childs.background;
-    var addChilds = [];
-    this._zIndexBox.zIndexArr.forEach(function (v) {
-        var _child = document.querySelector('#' + v);
-        var _image = _child.querySelector('.mt-image');
-        var childPos = JSON.parse(_$2.data(_child, 'mtouch-status'));
-        childPos.x *= ratio;
-        childPos.y *= ratio;
-        addChilds.push({
-            image: _image,
-            options: {
-                width: _image.offsetWidth * ratio,
-                pos: childPos
-            }
-        });
-    });
-
-    var bgLeft = void 0,
-        bgTop = void 0;
-    if (bg.ops.type == 'crop') {
-        var bgPos = JSON.parse(_$2.data(bg.el, 'mtouch-status')) || { left: 0, top: 0, scale: 1, rotate: 0 };
-        bgLeft = -bgPos.x;
-        bgTop = -bgPos.y;
-    } else {
-        bgLeft = bg.ops.left;
-        bgTop = bg.ops.top;
-    }
-    mc.background({
-        image: bg.el,
-        type: bg.ops.type,
-        left: bgLeft,
-        top: bgTop
-    }).add(addChilds).draw(function (b64) {
-        cbk(b64);
-    });
+Touchkit.prototype._insertCss = function () {
+    _$2.addCssRule('.mtouch-singleButton', 'display: none;');
+    _$2.addCssRule('.mt-child.mt-active', 'z-index: 99;outline:2px solid hsla(0,0%,100%,.5);');
+    _$2.addCssRule('.mt-active .mtouch-singleButton,.mt-active .mt-close-btn', 'display: inline-block;');
+    _$2.addCssRule('.mt-child', 'position:absolute;text-align:left;');
+    _$2.addCssRule('.mt-image', 'width:100%;height:100%;position:absolute;text-align:left;');
+    _$2.addCssRule('.mt-close-btn', 'position:absolute;width:30px;height:30px;top:-15px;right:-15px;background-size:100%;display:none;');
+    _$2.addCssRule('.mt-background', 'position:absolute;left:0;top:0;');
 };
 
 var w = $(window).width();
@@ -1995,8 +2064,8 @@ var Tk = new Touchkit({
 Tk.background({
     image: './images/p2.jpg',
     type: 'crop'
-});
-Tk.add({
+    // top:150,
+}).add({
     image: 'images/ear.png',
     width: '100px',
     use: {
@@ -2014,9 +2083,7 @@ Tk.add({
         rotate: 2.63
     },
     close: true
-});
-
-Tk.add({
+}).add({
     image: 'images/neck.png',
     width: 100,
     use: {
@@ -2035,12 +2102,16 @@ Tk.add({
     },
     close: true
 });
-// Tk.freeze(true);
 
 $('.js-btn').on('click', function () {
     Tk.exportImage(function (b64) {
-        $('.js-result').attr('src', b64);
+        $('.js-result').show();
+        $('.js-result img').attr('src', b64);
     });
+});
+$(window).on('click', '.js-result', function () {
+    $('.js-result img').attr('src', '');
+    $(this).hide();
 });
 $('.Button').on('touchstart', function () {
     $(this).addClass('taped');
