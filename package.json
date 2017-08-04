@@ -1,7 +1,7 @@
 {
   "name": "@meitu/touchkit",
   "version": "1.0.1",
-  "description": "meitu library template.",
+  "description": "a touch kit based on mtouch,it make you create a gesture app more quickly and simply",
   "main": "dist/touchkit.js",
   "module": "dist/touchkit.es.js",
   "moduleName": "Touchkit",
