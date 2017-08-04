@@ -210,6 +210,9 @@ export default {
             return;
         }
     },
+    isArr(arr) {
+        return Object.prototype.toString.call(arr) === '[object Array]';
+    },
 };
 
 function createStyleSheet() {

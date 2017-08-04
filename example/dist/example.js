@@ -1399,6 +1399,9 @@ var _$2 = {
             console.log('add image error');
             return;
         }
+    },
+    isArr: function isArr(arr) {
+        return Object.prototype.toString.call(arr) === '[object Array]';
     }
 };
 
@@ -1494,6 +1497,14 @@ function Touchkit(ops) {
 
     this._ops = {
         el: null,
+        use: {
+            drag: false,
+            pinch: false,
+            rotate: false,
+            singlePinch: false,
+            singleRotate: false
+        },
+        limit: false,
         // event
         event: {
             touchstart: function touchstart() {},
@@ -1668,48 +1679,56 @@ Touchkit.prototype.add = function (ops) {
         },
         close: false
     };
-    _ops = _$2.extend(_ops, ops);
-    _$2.getImage(_ops.image, function (img) {
-        var iw = img.naturalWidth,
-            ih = img.naturalHeight,
-            iratio = iw / ih;
-        var _templateEl = img;
-        var _ele = _$2.domify('<div class="mt-child" id="mt-child-' + _this2._childIndex + '" data-mt-index="' + _this2._childIndex + '"></div>')[0];
-        var originWidth = _this2._get('hor', _ops.width),
-            originHeight = originWidth / iratio;
-        var spaceX = (_ops.pos.scale - 1) * originWidth / 2,
-            spaceY = (_ops.pos.scale - 1) * originHeight / 2;
-        _ele.style = 'width:' + originWidth + 'px;height:' + originHeight + 'px';
-        _$2.addClass(_templateEl, 'mt-image');
-        _ele.appendChild(_templateEl);
-        // 是否添加关闭按钮；
-        if (_ops.close) {
-            _ele.appendChild(_$2.domify('<div class="mt-close-btn"></div>')[0]);
-        }
-        _this2.el.appendChild(_ele);
-        // 记录数据；
-        _this2._childs[_this2._childIndex] = {
-            el: _ele,
-            ops: _ops
-        };
-        // 根据id进行zIndex的设置；
-        _this2._zIndexBox.setIndex('mt-child-' + _this2._childIndex);
 
-        // 没有开启单指操作时，不添加单指按钮；
-        var addButton = _ops.use.singlePinch || _ops.use.singleRotate ? true : false;
-        // 切换operator到新添加的元素上；
-        _this2.switch(_ele, addButton);
+    if (!_$2.isArr(ops)) ops = [ops];
 
-        // space 为因为缩放造成的偏移误差；
-        _this2._setTransform(_ele, {
-            x: _this2._get('hor', _ops.pos.x) + spaceX,
-            y: _this2._get('ver', _ops.pos.y) + spaceY,
-            scale: _ops.pos.scale,
-            rotate: _ops.pos.rotate
+    ops.forEach(function (v) {
+        _$2.getImage(v.image, function (img) {
+            _this2._add(img, _$2.extend(_ops, v));
         });
-        _this2._childIndex++;
     });
     return this;
+};
+
+Touchkit.prototype._add = function (img, ops) {
+    var iw = img.naturalWidth,
+        ih = img.naturalHeight,
+        iratio = iw / ih;
+    var _templateEl = img;
+    var _ele = _$2.domify('<div class="mt-child" id="mt-child-' + this._childIndex + '" data-mt-index="' + this._childIndex + '"></div>')[0];
+    var originWidth = this._get('hor', ops.width),
+        originHeight = originWidth / iratio;
+    var spaceX = (ops.pos.scale - 1) * originWidth / 2,
+        spaceY = (ops.pos.scale - 1) * originHeight / 2;
+    _ele.style = 'width:' + originWidth + 'px;height:' + originHeight + 'px';
+    _$2.addClass(_templateEl, 'mt-image');
+    _ele.appendChild(_templateEl);
+    // 是否添加关闭按钮；
+    if (ops.close || this._ops.close) {
+        _ele.appendChild(_$2.domify('<div class="mt-close-btn"></div>')[0]);
+    }
+    this.el.appendChild(_ele);
+    // 记录数据；
+    this._childs[this._childIndex] = {
+        el: _ele,
+        ops: ops
+    };
+    // 根据id进行zIndex的设置；
+    this._zIndexBox.setIndex('mt-child-' + this._childIndex);
+
+    // 没有开启单指操作时，不添加单指按钮；
+    var addButton = ops.use.singlePinch || this._ops.use.singlePinch || ops.use.singleRotate || this._ops.use.singleRotate ? true : false;
+    // 切换operator到新添加的元素上；
+    this.switch(_ele, addButton);
+
+    // space 为因为缩放造成的偏移误差；
+    this._setTransform(_ele, {
+        x: this._get('hor', ops.pos.x) + spaceX,
+        y: this._get('ver', ops.pos.y) + spaceY,
+        scale: ops.pos.scale,
+        rotate: ops.pos.rotate
+    });
+    this._childIndex++;
 };
 // 使用 mcanvas 合成图片后导出 base64;
 Touchkit.prototype.exportImage = function (cbk) {
@@ -1782,7 +1801,7 @@ Touchkit.prototype._bind = function () {
     _$2.delegate(this.el, 'click', '.mt-child', function (ev) {
         var el = ev.delegateTarget,
             _ops = _this3._getOperatorOps(el),
-            _addButton = _ops.use.singlePinch || _ops.use.singleRotate ? true : false;
+            _addButton = _ops.use.singlePinch || _this3._ops.use.singlePinch || _ops.use.singleRotate || _this3._ops.use.singleRotate ? true : false;
         _this3.switch(el, _addButton);
         _this3._zIndexBox.toTop(el.id);
     });
@@ -1809,7 +1828,7 @@ Touchkit.prototype.drag = function (ev) {
     if (!this.freezed) {
         if (this.operator) {
             var ops = this._getOperatorOps();
-            if (ops.use.drag) {
+            if (ops.use.drag || this._ops.use.drag) {
                 this.transform.x += ev.delta.deltaX;
                 this.transform.y += ev.delta.deltaY;
                 this._setTransform();
@@ -1823,7 +1842,7 @@ Touchkit.prototype.pinch = function (ev) {
     if (!this.freezed) {
         if (this.operator) {
             var ops = this._getOperatorOps();
-            if (ops.use.pinch) {
+            if (ops.use.pinch || this._ops.use.pinch) {
                 this.transform.scale *= ev.delta.scale;
                 this._setTransform();
             }
@@ -1835,7 +1854,7 @@ Touchkit.prototype.rotate = function (ev) {
     if (!this.freezed) {
         if (this.operator) {
             var ops = this._getOperatorOps();
-            if (ops.use.rotate) {
+            if (ops.use.rotate || this._ops.use.rotate) {
                 this.transform.rotate += ev.delta.rotate;
                 this._setTransform();
             }
@@ -1847,7 +1866,7 @@ Touchkit.prototype.singlePinch = function (ev) {
     if (!this.freezed) {
         if (this.operator) {
             var ops = this._getOperatorOps();
-            if (ops.use.singlePinch) {
+            if (ops.use.singlePinch || this._ops.use.singlePinch) {
                 this.transform.scale *= ev.delta.scale;
                 this._setTransform();
             }
@@ -1859,7 +1878,7 @@ Touchkit.prototype.singleRotate = function (ev) {
     if (!this.freezed) {
         if (this.operator) {
             var ops = this._getOperatorOps();
-            if (ops.use.singleRotate) {
+            if (ops.use.singleRotate || this._ops.use.singleRotate) {
                 this.transform.rotate += ev.delta.rotate;
                 this._setTransform();
             }
@@ -1873,28 +1892,34 @@ Touchkit.prototype._setTransform = function () {
 
     var trans = JSON.parse(JSON.stringify(transform));
     var ops = this._getOperatorOps();
-    var defaulLimit = {
+
+    var defaulLimit = this._ops.limit && _typeof(this._ops.limit) == 'object' ? _$2.extend({
+        x: 0.5,
+        y: 0.5,
+        maxScale: 3,
+        minScale: 0.4
+    }, this._ops.limit) : {
         x: 0.5,
         y: 0.5,
         maxScale: 3,
         minScale: 0.4
     };
+
     var _limit = ops.limit && ops.limit !== true ? _$2.extend(defaulLimit, ops.limit) : defaulLimit;
-    if (ops.limit) {
+    if (ops.limit || this._ops.limit) {
         trans = this._limitOperator(trans, _limit);
     }
-    // 当 isHold 参数开启时，反向设置按钮的scale值，使按钮大小保持不变；
-    if (ops.use.singlePinch) {
+    if (ops.use.singlePinch || this._ops.use.singlePinch) {
         var singlePinchBtn = el.querySelector('.mtouch-singleButton');
         singlePinchBtn.style.transform = 'scale(' + 1 / trans.scale + ')';
         singlePinchBtn.style.webkitTransform = 'scale(' + 1 / trans.scale + ')';
     }
-    if (ops.use.singleRotate) {
+    if (ops.use.singleRotate || this._ops.use.singleRotate) {
         var singleRotateBtn = el.querySelector('.mtouch-singleButton');
         singleRotateBtn.style.transform = 'scale(' + 1 / trans.scale + ')';
         singleRotateBtn.style.webkitTransform = 'scale(' + 1 / trans.scale + ')';
     }
-    if (ops.close) {
+    if (ops.close || this._ops.close) {
         var closeBtn = el.querySelector('.mt-close-btn');
         closeBtn.style.transform = 'scale(' + 1 / trans.scale + ')';
         closeBtn.style.webkitTransform = 'scale(' + 1 / trans.scale + ')';
@@ -2065,7 +2090,13 @@ $('.item').css({
 });
 
 var Tk = new Touchkit({
-    el: '.js-par'
+    el: '.js-par',
+    limit: {
+        x: 0.5,
+        y: 0.5,
+        maxScale: 3,
+        minScale: 0.4
+    }
 });
 Tk.background({
     image: './images/p2.jpg',
@@ -2081,14 +2112,19 @@ Tk.background({
         singlePinch: true,
         singleRotate: true
     },
-    limit: true,
+    limit: {
+        x: 0,
+        y: 0,
+        maxScale: 3,
+        minScale: 0.4
+    },
     pos: {
         x: 116,
         y: 45,
         scale: 1.25,
         rotate: 2.63
-    },
-    close: true
+    }
+    // close:true,
 }).add({
     image: 'images/neck.png',
     width: 100,

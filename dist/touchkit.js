@@ -1,3 +1,9 @@
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define(factory) :
+	(global.Touchkit = factory());
+}(this, (function () { 'use strict';
+
 var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _typeof$1 = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
@@ -523,9 +529,6 @@ MTouch.prototype._on = function (evName, handler, operator) {
 MTouch.prototype.off = function (evName, handler) {
     this[evName].del(handler);
 };
-
-
-//# sourceMappingURL=mtouch.es.js.map
 
 var _typeof2$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -1172,9 +1175,6 @@ MCanvas.prototype._next = function () {
         this.end();
     }
 };
-
-
-//# sourceMappingURL=mcanvas.es.js.map
 
 var _typeof$3 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -2076,83 +2076,7 @@ Touchkit.prototype._insertCss = function () {
     _$2.addCssRule('.mt-background', 'position:absolute;left:0;top:0;');
 };
 
-var w = $(window).width();
+return Touchkit;
 
-$('.item').css({
-    width: w + 'px',
-    height: w + 100 + 'px'
-});
-
-var Tk = new Touchkit({
-    el: '.js-par',
-    limit: {
-        x: 0.5,
-        y: 0.5,
-        maxScale: 3,
-        minScale: 0.4
-    }
-});
-Tk.background({
-    image: './images/p2.jpg',
-    type: 'crop'
-    // top:150,
-}).add({
-    image: 'images/ear.png',
-    width: '100px',
-    use: {
-        drag: true,
-        pinch: true,
-        rotate: true,
-        singlePinch: true,
-        singleRotate: true
-    },
-    limit: {
-        x: 0,
-        y: 0,
-        maxScale: 3,
-        minScale: 0.4
-    },
-    pos: {
-        x: 116,
-        y: 45,
-        scale: 1.25,
-        rotate: 2.63
-    }
-    // close:true,
-}).add({
-    image: 'images/neck.png',
-    width: 100,
-    use: {
-        drag: true,
-        pinch: true,
-        rotate: true,
-        singlePinch: true,
-        singleRotate: true
-    },
-    limit: true,
-    pos: {
-        x: 0,
-        y: 0,
-        scale: 1,
-        rotate: 0
-    },
-    close: true
-});
-
-$('.js-btn').on('click', function () {
-    Tk.exportImage(function (b64) {
-        $('.js-result').show();
-        $('.js-result img').attr('src', b64);
-    });
-});
-$(window).on('click', '.js-result', function () {
-    $('.js-result img').attr('src', '');
-    $(this).hide();
-});
-$('.Button').on('touchstart', function () {
-    $(this).addClass('taped');
-});
-$('.Button').on('touchend', function () {
-    $(this).removeClass('taped');
-});
-//# sourceMappingURL=example.es.js.map
+})));
+//# sourceMappingURL=touchkit.js.map

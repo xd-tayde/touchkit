@@ -1,6 +1,6 @@
 {
   "name": "@meitu/touchkit",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "meitu library template.",
   "main": "dist/touchkit.js",
   "module": "dist/touchkit.es.js",

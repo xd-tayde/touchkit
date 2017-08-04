@@ -9,6 +9,12 @@ $('.item').css({
 
 let Tk = new Touchkit({
     el:'.js-par',
+    limit:{
+        x:0.5,
+        y:0.5,
+        maxScale:3,
+        minScale:0.4,
+    },
 });
 Tk.background({
     image:'./images/p2.jpg',
@@ -24,14 +30,19 @@ Tk.background({
         singlePinch:true,
         singleRotate:true,
     },
-    limit:true,
+    limit:{
+        x:0,
+        y:0,
+        maxScale:3,
+        minScale:0.4,
+    },
     pos:{
         x:116,
         y:45,
         scale:1.25,
         rotate:2.63,
     },
-    close:true,
+    // close:true,
 }).add({
     image:`images/neck.png`,
     width:100,
