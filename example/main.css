@@ -153,7 +153,7 @@ html,body{
 }
 
 .sub-title{
-    font-size: 24px;
+    font-size: 14px;
     line-height: 48px;
     color: #FF9999;
     text-align: center;
@@ -178,13 +178,43 @@ html,body{
     position: fixed;
     left: 0;
     top: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.8);
     display: none;
 }
-.result>img{
+.result img{
     width: 300px;
+}
+.result-wrap{
     position: absolute;
     left: 50%;
-    top: 50%;
+    top: 40%;
     transform: translate(-50%,-50%);
+}
+.result h2{
+    color: white;
+    font-size: 14px;
+    text-align: center;
+    line-height: 30px;
+}
+
+.tips{
+    display: inline-block;
+    color: #996699;
+    width: 80%;
+    text-align: left;
+}
+.mask{
+    width: 100%;
+    height: 100%;
+    background: white;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 9999;
+    color: #996699;
+    font-size: 24px;
+    text-align:center;
+    padding-top: 100px;
+    box-sizing: border-box;
+    display: none;
 }

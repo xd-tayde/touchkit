@@ -524,9 +524,6 @@ MTouch.prototype.off = function (evName, handler) {
     this[evName].del(handler);
 };
 
-
-//# sourceMappingURL=mtouch.es.js.map
-
 var _typeof2$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _typeof$2 = typeof Symbol === "function" && _typeof2$1(Symbol.iterator) === "symbol" ? function (obj) {
@@ -1172,9 +1169,6 @@ MCanvas.prototype._next = function () {
         this.end();
     }
 };
-
-
-//# sourceMappingURL=mcanvas.es.js.map
 
 var _typeof$3 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -2083,6 +2077,10 @@ $('.item').css({
     height: w + 100 + 'px'
 });
 
+if (!isMobile()) {
+    $('.js-mask').show();
+}
+
 var Tk = new Touchkit({
     el: '.js-par',
     limit: {
@@ -2093,7 +2091,7 @@ var Tk = new Touchkit({
     }
 });
 Tk.background({
-    image: './images/p2.jpg',
+    image: './images/p3.jpg',
     type: 'crop'
     // top:150,
 }).add({
@@ -2106,12 +2104,7 @@ Tk.background({
         singlePinch: true,
         singleRotate: true
     },
-    limit: {
-        x: 0,
-        y: 0,
-        maxScale: 3,
-        minScale: 0.4
-    },
+    limit: true,
     pos: {
         x: 116,
         y: 45,
@@ -2155,4 +2148,12 @@ $('.Button').on('touchstart', function () {
 $('.Button').on('touchend', function () {
     $(this).removeClass('taped');
 });
+
+function isMobile() {
+    if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/webOS/i) || navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/BlackBerry/i) || navigator.userAgent.match(/Windows Phone/i)) {
+        return true;
+    } else {
+        return false;
+    }
+}
 //# sourceMappingURL=example.es.js.map

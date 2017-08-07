@@ -7,6 +7,10 @@ $('.item').css({
     height:(w+100)+'px',
 });
 
+if(!isMobile()){
+    $('.js-mask').show();
+}
+
 let Tk = new Touchkit({
     el:'.js-par',
     limit:{
@@ -17,7 +21,7 @@ let Tk = new Touchkit({
     },
 });
 Tk.background({
-    image:'./images/p2.jpg',
+    image:'./images/p3.jpg',
     type:'crop',
     // top:150,
 }).add({
@@ -30,12 +34,7 @@ Tk.background({
         singlePinch:true,
         singleRotate:true,
     },
-    limit:{
-        x:0,
-        y:0,
-        maxScale:3,
-        minScale:0.4,
-    },
+    limit:true,
     pos:{
         x:116,
         y:45,
@@ -79,3 +78,19 @@ $('.Button').on('touchstart',function(){
 $('.Button').on('touchend',function(){
     $(this).removeClass('taped');
 });
+
+function isMobile() {
+   if( navigator.userAgent.match(/Android/i)
+   || navigator.userAgent.match(/webOS/i)
+   || navigator.userAgent.match(/iPhone/i)
+   || navigator.userAgent.match(/iPad/i)
+   || navigator.userAgent.match(/iPod/i)
+   || navigator.userAgent.match(/BlackBerry/i)
+   || navigator.userAgent.match(/Windows Phone/i)
+   ){
+       return true;
+   }
+   else {
+       return false;
+   }
+}

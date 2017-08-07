@@ -35,18 +35,23 @@
     </script>
 </head>
 <body>
+    <div class="mask js-mask">please open in the mobile or use the device mode of browser!</div>
     <h1 class="title">touchkit.js</h1>
     <div class="wrap js-wrap">
         <div class="item sticker">
-            <h2 class="sub-title">贴纸模式</h2>
+            <h2 class="sub-title">( please use in mobile or device mode! )</h2>
             <div class="parent js-par"></div>
+            <div class="tips">
+                Tips:<br/>you can select any widget to operate it and tap the background to move the background-image!
+            </div>
         </div>
     </div>
-    <div class="btn js-btn Button">
-        合成图片
-    </div>
+    <div class="btn js-btn Button">exportImage</div>
     <div class="result js-result">
-        <img style="width:300px;" src="" alt="">
+        <div class="result-wrap">
+            <h2>This is already a image!<br/>you can save this image by longTap!</h2>
+            <img style="width:300px;" src="" alt="">
+        </div>
     </div>
 
     <script src="./zepto.min.js"></script>
