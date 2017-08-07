@@ -29,9 +29,11 @@
 ```js
 // 初始化创建手势盒子
 // init create touch box
-touchkit('.js-par')
+new Touchkit('.js-par')
 
 // 添加背景
+// 背景包含两种模式：contain/crop；
+// 背景会处于手势盒子的底部，crop模式会可移动进行选择裁剪，不支持缩放旋转焦点等功能；
 // add background image
 .background({
     image:'./images/p2.jpg',
@@ -85,7 +87,7 @@ touchkit('.js-par')
 
 ## 创建实例(init create)
 
-**`touchkit(ops)` || `new Touchkit(ops)`**
+**`new Touchkit(ops)`**
 
 初始化创建手势盒子。
 

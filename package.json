@@ -2,6 +2,7 @@
   "name": "@meitu/touchkit",
   "version": "1.0.1",
   "description": "a touch kit based on mtouch,it make you create a gesture app more quickly and simply",
+  "keywords":["touch","hammer","finger","sticker","image-composer","image-croper","gesture"],
   "main": "dist/touchkit.js",
   "module": "dist/touchkit.es.js",
   "moduleName": "Touchkit",
@@ -15,7 +16,7 @@
     "lint": "eslint src"
   },
   "repository": {
-    "url": "https://gitlab.meitu.com/npm/meitu-touchkit.git",
+    "url": "https://github.com/xd-tayde/touchkit",
     "type": "git"
   },
   "author": "gxd <gxd@meitu.com>",
