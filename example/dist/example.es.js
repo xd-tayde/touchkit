@@ -1481,6 +1481,7 @@ var ZIndex = function () {
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var EVENT = ['touchstart', 'touchmove', 'touchend', 'drag', 'dragstart', 'dragend', 'pinch', 'pinchstart', 'pinchend', 'rotate', 'rotatestart', 'rotatend', 'singlePinchstart', 'singlePinch', 'singlePinchend', 'singleRotate', 'singleRotatestart', 'singleRotatend'];
+var noop = function noop() {};
 
 window.requestAnimFrame = function () {
     return window.requestAnimationFrame || window.webkitRequestAnimationFrame || function (callback) {
@@ -1489,6 +1490,8 @@ window.requestAnimFrame = function () {
 }();
 
 function Touchkit(ops) {
+    var _this = this;
+
     // 兼容不使用 new 的方式；
     if (!(this instanceof Touchkit)) return new Touchkit(ops);
 
@@ -1503,27 +1506,12 @@ function Touchkit(ops) {
         },
         limit: false,
         // event
-        event: {
-            touchstart: function touchstart() {},
-            touchmove: function touchmove() {},
-            touchend: function touchend() {},
-            dragstart: function dragstart() {},
-            drag: function drag() {},
-            dragend: function dragend() {},
-            pinchstart: function pinchstart() {},
-            pinch: function pinch() {},
-            pinchend: function pinchend() {},
-            rotatestart: function rotatestart() {},
-            rotate: function rotate() {},
-            rotatend: function rotatend() {},
-            singlePinchstart: function singlePinchstart() {},
-            singlePinch: function singlePinch() {},
-            singlePinchend: function singlePinchend() {},
-            singleRotatestart: function singleRotatestart() {},
-            singleRotate: function singleRotate() {},
-            singleRotatend: function singleRotatend() {}
-        }
+        event: {}
     };
+
+    EVENT.map(function (eventName) {
+        return _this._ops.event[eventName] = noop;
+    });
 
     if ((typeof ops === 'undefined' ? 'undefined' : _typeof(ops)) == 'object') {
         this._ops = _$2.extend(this._ops, ops);
@@ -1567,7 +1555,7 @@ Touchkit.prototype._init = function () {
 };
 
 Touchkit.prototype.background = function (ops) {
-    var _this = this;
+    var _this2 = this;
 
     var _ops = {
         // 背景图片，type: url/HTMLImageElement/HTMLCanvasElement
@@ -1590,8 +1578,8 @@ Touchkit.prototype.background = function (ops) {
             ih = img.naturalHeight,
             iratio = iw / ih;
         // 容器宽高及宽高比；
-        var pw = _this.elStatus.width,
-            ph = _this.elStatus.height,
+        var pw = _this2.elStatus.width,
+            ph = _this2.elStatus.height,
             pratio = pw / ph;
 
         var left = void 0,
@@ -1659,12 +1647,12 @@ Touchkit.prototype.background = function (ops) {
             webkitTransform: 'translate(' + left + 'px,' + top + 'px)'
         });
 
-        _this.el.appendChild(img);
+        _this2.el.appendChild(img);
 
         // 记录背景图参数；
         _ops.ratio = ratio;
 
-        _this._childs.background = {
+        _this2._childs.background = {
             el: img,
             ops: _ops
         };
@@ -1673,7 +1661,7 @@ Touchkit.prototype.background = function (ops) {
 };
 
 Touchkit.prototype.add = function (ops) {
-    var _this2 = this;
+    var _this3 = this;
 
     var _ops = {
         image: '',
@@ -1699,7 +1687,7 @@ Touchkit.prototype.add = function (ops) {
 
     ops.forEach(function (v) {
         _$2.getImage(v.image, function (img) {
-            _this2._add(img, _$2.extend(_ops, v));
+            _this3._add(img, _$2.extend(_ops, v));
         });
     });
     return this;
@@ -1777,7 +1765,7 @@ Touchkit.prototype.cropBox = function () {
 };
 // 使用 mcanvas 合成图片后导出 base64;
 Touchkit.prototype.exportImage = function (cbk) {
-    var _this3 = this;
+    var _this4 = this;
 
     var cwidth = this.elStatus.width,
         cheight = this.elStatus.height;
@@ -1806,8 +1794,8 @@ Touchkit.prototype.exportImage = function (cbk) {
         });
     });
     mc.add(addChilds).draw(function (b64) {
-        if (_this3._cropBox) {
-            var cropBoxOps = _this3._childs.cropBox;
+        if (_this4._cropBox) {
+            var cropBoxOps = _this4._childs.cropBox;
             var cropBox = cropBoxOps.el;
             var cropBoxPos = _$2.getPos(cropBox);
             _$2.getImage(b64, function (img) {
@@ -1831,36 +1819,36 @@ Touchkit.prototype.exportImage = function (cbk) {
 };
 
 Touchkit.prototype._bind = function () {
-    var _this4 = this;
+    var _this5 = this;
 
     // 绑定所有事件；
     EVENT.forEach(function (evName) {
-        if (!_this4[evName]) {
-            _this4[evName] = function () {
-                _this4._ops.event[evName]();
+        if (!_this5[evName]) {
+            _this5[evName] = function () {
+                _this5._ops.event[evName]();
             };
         }
-        _this4.mt.on(evName, _this4[evName].bind(_this4));
+        _this5.mt.on(evName, _this5[evName].bind(_this5));
     });
 
     // 点击子元素外的区域失去焦点；
     this.el.addEventListener('click', function (ev) {
-        if (!_this4._isAdd(ev.target)) {
-            _this4.switch(null);
+        if (!_this5._isAdd(ev.target)) {
+            _this5.switch(null);
         }
         // 如果背景为裁剪模式，则切换到操作背景图；
         if (_$2.hasClass(ev.target, 'mt-background') || _$2.hasClass(ev.target, 'mt-crop-box')) {
-            _this4.switch(ev.target);
+            _this5.switch(ev.target);
         }
     });
 
     // 切换子元素；
     _$2.delegate(this.el, 'click', '.mt-child', function (ev) {
         var el = ev.delegateTarget,
-            _ops = _this4._getOperatorOps(el),
-            _addButton = _ops.use.singlePinch || _this4._ops.use.singlePinch || _ops.use.singleRotate || _this4._ops.use.singleRotate ? true : false;
-        _this4.switch(el, _addButton);
-        _this4._zIndexBox.toTop(el.id);
+            _ops = _this5._getOperatorOps(el),
+            _addButton = _ops.use.singlePinch || _this5._ops.use.singlePinch || _ops.use.singleRotate || _this5._ops.use.singleRotate ? true : false;
+        _this5.switch(el, _addButton);
+        _this5._zIndexBox.toTop(el.id);
     });
 
     // 关闭按钮事件；
@@ -1869,10 +1857,10 @@ Touchkit.prototype._bind = function () {
         var _child = _el.parentNode || _el.parentElement;
         var index = _$2.data(_child, 'mt-index');
         if (index == 'cropBox') {
-            _this4.switch(null);
-            _this4._cropBox = false;
+            _this5.switch(null);
+            _this5._cropBox = false;
         } else {
-            _this4._zIndexBox.removeIndex(_child.id);
+            _this5._zIndexBox.removeIndex(_child.id);
         }
         _$2.remove(_child);
     });
