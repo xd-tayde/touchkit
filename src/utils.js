@@ -4,8 +4,10 @@ export default {
         let str = JSON.stringify(transform);
         let value = `translate3d(${transform.x}px,${transform.y}px,0px) scale(${transform.scale}) rotate(${transform.rotate}deg)`;
         el = this.getEl(el);
-        el.style.transform = value;
-        el.style.webkitTransform = value;
+        this.setStyle(el,{
+            transform : value,
+            webkitTransform : value,
+        });
         el.setAttribute('data-mtouch-status', str);
     },
     getPos(el) {
@@ -88,6 +90,11 @@ export default {
         }
         return _el;
     },
+    setStyle(el,ops){
+        this.forin(ops,(k,v)=>{
+            el.style[k] = v;
+        });
+    },
     addClass(el,cls){
         let _cls;
         el = this.getEl(el);
@@ -124,6 +131,11 @@ export default {
                 cbk(k,obj[k]);
             }
         }
+    },
+    xRatio(pos,ratio){
+        pos.x *= ratio;
+        pos.y *= ratio;
+        return pos;
     },
     data(el,key,value){
         el = this.getEl(el);

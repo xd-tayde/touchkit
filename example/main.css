@@ -3,6 +3,9 @@ body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, 
 table { border-collapse:collapse; border-spacing:0; }
 em { font-style:normal; }
 fieldset, img { border:0; vertical-align: bottom;}
+img::selection {
+    background: transparent;
+}
 li { list-style:none; }
 caption, th { text-align:left; }
 h1, h2, h3, h4, h5, h6 { font-size:100%;}
@@ -12,7 +15,7 @@ i,cite{font-style:normal;}
 a {text-decoration:none; }
 a:focus{outline: none;}
 html{font-size:20px;}
-html,body{-webkit-touch-callout:none;height:100%;}
+html,body{height:100%;-webkit-tap-highlight-color: rgba(0, 0, 0, 0);}
 .clearfix {  zoom:1; }
 .clearfix:after { content:""; display:block;clear:both;height: 0;visibility: hidden;}
 .hide{display:none} .fr{float:right} .fl{float:left;}.block{display: block;}
@@ -68,16 +71,29 @@ html,body{
     vertical-align: top;
     text-align: center;
 }
-.btn{
-    width: 150px;
-    height: 50px;
+.export{
+    width: 130px;
+    height: 40px;
     background: #996699;
     position: fixed;
     color: white;
-    line-height: 50px;
+    line-height: 40px;
     text-align: center;
     border-radius: 25px;
-    left: 50%;
+    left: 75%;
+    margin-left: -75px;
+    bottom:20px;
+}
+.addCropBox{
+    width: 130px;
+    height: 40px;
+    background: #996699;
+    position: fixed;
+    color: white;
+    line-height: 40px;
+    text-align: center;
+    border-radius: 25px;
+    left: 35%;
     margin-left: -75px;
     bottom:20px;
 }
@@ -165,12 +181,6 @@ html,body{
     width: 300px;
     height: 300px;
 
-}
-.mtouch-singleButton{
-    background-image:url(images/pinch.png);
-}
-.mt-close-btn{
-    background-image:url(images/remove.png);
 }
 .result{
     width: 100%;

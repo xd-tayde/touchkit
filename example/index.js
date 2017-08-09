@@ -22,7 +22,7 @@ let Tk = new Touchkit({
 });
 Tk.background({
     image:'./images/p3.jpg',
-    type:'crop',
+    type:'contain',
     // top:150,
 }).add({
     image:`images/ear.png`,
@@ -41,7 +41,7 @@ Tk.background({
         scale:1.25,
         rotate:2.63,
     },
-    // close:true,
+    close:true,
 }).add({
     image:`images/neck.png`,
     width:100,
@@ -62,13 +62,17 @@ Tk.background({
     close:true,
 });
 
-$('.js-btn').on('click',function(){
+$('.js-cropBox').on('click',function(){
+    Tk.cropBox();
+});
+
+$('.js-export').on('click',function(){
     Tk.exportImage(b64=>{
         $('.js-result').show();
         $('.js-result img').attr('src',b64);
     });
 });
-$(window).on('click','.js-result',function(){
+$('.js-result').on('click',function(){
     $('.js-result img').attr('src','');
     $(this).hide();
 });

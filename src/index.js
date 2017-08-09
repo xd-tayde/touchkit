@@ -1,5 +1,6 @@
-import MT from '@meitu/mtouch';
-import MC from '@meitu/mcanvas';
+import MT from 'mtouch';
+import MC from 'mcanvas';
+import removeBtn from './removeBtn';
 import ZIndex from './zIndex';
 import _ from './utils';
 
@@ -50,14 +51,17 @@ export default function Touchkit(ops) {
         width:this.el.clientWidth || this.el.offsetWidth,
         height:this.el.clientHeight || this.el.offsetHeight,
     };
+
+    this._cropBox = false;
+
+    this._insertCss();
+
     this._init();
 
     // 初始化mtouch；
     this.mt = MT(this.el);
 
     this._bind();
-
-    this._insertCss();
 
 }
 
@@ -88,9 +92,8 @@ Touchkit.prototype.background = function(ops){
         left:0,
         top:0,
         // 在type=crop时使用，背景图只需启动拖动操作；
-        use:{
-            drag:true,
-        },
+        use:{},
+        static:false,
     };
     _ops = _.extend(_ops,ops);
     _.getImage(_ops.image, img => {
@@ -124,6 +127,13 @@ Touchkit.prototype.background = function(ops){
                 height = ph;
                 ratio = ih / height;
             }
+            if(!ops.static){
+                _ops.use = {
+                    drag:true,
+                    pinch:true,
+                    rotate:true,
+                };
+            }
         }else if(_ops.type == 'crop'){
             left = 0;
             top = 0;
@@ -144,14 +154,23 @@ Touchkit.prototype.background = function(ops){
                 maxScale:1,
                 minScale:1,
             };
+            if(!ops.static){
+                _ops.use = {
+                    drag : true,
+                };
+            }
         }
-        img.style = `width:${width}px;height:${height}px;left:${left}px;top:${top}px`;
+        _.setStyle(img,{
+            width:`${width}px`,
+            height:`${height}px`,
+            transform:`translate(${left}px,${top}px)`,
+            webkitTransform:`translate(${left}px,${top}px)`,
+        });
+
         this.el.appendChild(img);
 
         // 记录背景图参数；
         _ops.ratio = ratio;
-        _ops.left = left;
-        _ops.top = top;
 
         this._childs.background = {
             el:img,
@@ -202,7 +221,11 @@ Touchkit.prototype._add = function(img,ops){
         originHeight = originWidth / iratio;
     let spaceX = (ops.pos.scale - 1) * originWidth/2,
         spaceY = (ops.pos.scale - 1) * originHeight/2;
-    _ele.style = `width:${originWidth}px;height:${originHeight}px`;
+    _.setStyle(_ele,{
+        width:`${originWidth}px`,
+        height:`${originHeight}px`,
+    });
+
     _.addClass(_templateEl,'mt-image');
     _ele.appendChild(_templateEl);
     // 是否添加关闭按钮；
@@ -232,22 +255,52 @@ Touchkit.prototype._add = function(img,ops){
     });
     this._childIndex++;
 };
+Touchkit.prototype.cropBox = function(){
+    let cropBox = _.domify(`<div class="mt-crop-box" data-mt-index="cropBox"><div class="mt-close-btn"></div></div>`)[0];
+    this.el.appendChild(cropBox);
+    this.switch(cropBox);
+    this._cropBox = true;
+    this._childs['cropBox'] = {
+        el:cropBox,
+        ops: {
+            width:cropBox.offsetWidth,
+            height:cropBox.offsetHeight,
+            use:{
+                drag:true,
+                pinch:false,
+                rotate:false,
+                singlePinch:true,
+                singleRotate:false,
+            },
+            limit:{
+                x:0,
+                y:0,
+                maxScale:1,
+                minScale:0.2,
+            },
+        },
+    };
+};
 // 使用 mcanvas 合成图片后导出 base64;
 Touchkit.prototype.exportImage = function(cbk){
     let cwidth = this.elStatus.width,
         cheight = this.elStatus.height;
     let bg = this._childs.background;
-    let bgLeft,bgTop;
     let ratio = bg.ops.ratio;
-    let mc = new MC(cwidth*ratio,cheight*ratio);
-    let addChilds = [];
+    let bgPos = _.xRatio(_.getPos(bg.el),ratio);
+    let mc = new MC(cwidth*ratio,cheight*ratio,'#ffffff');
+    let addChilds = [{
+        image:bg.el,
+        options:{
+            width:bg.el.width * ratio,
+            pos:bgPos,
+        },
+    }];
     this._zIndexBox.zIndexArr.forEach(v=>{
         let child = document.querySelector('#'+v);
         let image = child.querySelector('.mt-image');
-        let childPos = JSON.parse(_.data(child,'mtouch-status'));
+        let childPos = _.xRatio(_.getPos(child),ratio);
         let width = image.clientWidth || image.offsetWidth;
-        childPos.x *= ratio;
-        childPos.y *= ratio;
         addChilds.push({
             image:image,
             options:{
@@ -256,21 +309,28 @@ Touchkit.prototype.exportImage = function(cbk){
             },
         });
     });
-    if(bg.ops.type == 'crop'){
-        let bgPos = JSON.parse(_.data(bg.el,'mtouch-status')) || {left:0,top:0,scale:1,rotate:0};
-        bgLeft = -bgPos.x;
-        bgTop = -bgPos.y;
-    }else{
-        bgLeft = bg.ops.left;
-        bgTop = bg.ops.top;
-    }
-    mc.background({
-        image:bg.el,
-        type:bg.ops.type,
-        left:bgLeft * ratio,
-        top:bgTop * ratio,
-    }).add(addChilds).draw(b64=>{
-        cbk(b64);
+    mc.add(addChilds).draw(b64=>{
+        if(this._cropBox){
+            let cropBoxOps = this._childs.cropBox;
+            let cropBox = cropBoxOps.el;
+            let cropBoxPos = _.getPos(cropBox);
+            _.getImage(b64,img=>{
+                let cMc = new MC(cropBoxOps.ops.width * ratio,cropBoxOps.ops.height * ratio);
+                cMc.add(img,{
+                    width:img.naturalWidth,
+                    pos:{
+                        x: -cropBoxPos.x * ratio,
+                        y: -cropBoxPos.y * ratio,
+                        scale:1,
+                        rotate:0,
+                    },
+                }).draw(base64=>{
+                    cbk(base64);
+                });
+            });
+        }else{
+            cbk(b64);
+        }
     });
 };
 
@@ -291,7 +351,7 @@ Touchkit.prototype._bind = function(){
             this.switch(null);
         }
         // 如果背景为裁剪模式，则切换到操作背景图；
-        if(_.hasClass(ev.target,'mt-background') && _.data(ev.target,'mt-bg-type') == 'crop'){
+        if(_.hasClass(ev.target,'mt-background') || _.hasClass(ev.target,'mt-crop-box')){
             this.switch(ev.target);
         }
 
@@ -310,7 +370,13 @@ Touchkit.prototype._bind = function(){
     _.delegate(this.el,'click','.mt-close-btn',ev=>{
         let _el = ev.delegateTarget;
         let _child = _el.parentNode || _el.parentElement;
-        this._zIndexBox.removeIndex(_child.id);
+        let index = _.data(_child,'mt-index');
+        if(index == 'cropBox'){
+            this.switch(null);
+            this._cropBox = false;
+        }else{
+            this._zIndexBox.removeIndex(_child.id);
+        }
         _.remove(_child);
     });
 };
@@ -366,9 +432,25 @@ Touchkit.prototype.singlePinch = function(ev){
     if(!this.freezed){
         if(this.operator){
             let ops = this._getOperatorOps();
-            if(ops.use.singlePinch || this._ops.use.singlePinch){
-                this.transform.scale *= ev.delta.scale;
-                this._setTransform();
+            if(_.data(this.operator,'mt-index') == 'cropBox'){
+                if(ops.use.singlePinch || this._ops.use.singlePinch){
+                    let cropBoxPos = _.getPos(this.operator);
+                    if((ops.width + ev.delta.deltaX + cropBoxPos.x) < this.elStatus.width){
+                        ops.width += ev.delta.deltaX;
+                    }
+                    if((ops.height + ev.delta.deltaY + cropBoxPos.y) < this.elStatus.height){
+                        ops.height += ev.delta.deltaY;
+                    }
+                    _.setStyle(this.operator,{
+                        width:`${ops.width}px`,
+                        height:`${ops.height}px`,
+                    });
+                }
+            }else{
+                if(ops.use.singlePinch || this._ops.use.singlePinch){
+                    this.transform.scale *= ev.delta.scale;
+                    this._setTransform();
+                }
             }
         }
         this._ops.event.singlePinch(ev);
@@ -408,18 +490,24 @@ Touchkit.prototype._setTransform = function(el = this.operator, transform = this
     }
     if(ops.use.singlePinch || this._ops.use.singlePinch){
         let singlePinchBtn = el.querySelector(`.mtouch-singleButton`);
-            singlePinchBtn.style.transform = `scale(${1/trans.scale})`;
-            singlePinchBtn.style.webkitTransform = `scale(${1/trans.scale})`;
+        _.setStyle(singlePinchBtn,{
+            transform:`scale(${1/trans.scale})`,
+            webkitTransform:`scale(${1/trans.scale})`,
+        });
     }
     if(ops.use.singleRotate || this._ops.use.singleRotate){
         let singleRotateBtn = el.querySelector(`.mtouch-singleButton`);
-            singleRotateBtn.style.transform = `scale(${1/trans.scale})`;
-            singleRotateBtn.style.webkitTransform = `scale(${1/trans.scale})`;
+        _.setStyle(singleRotateBtn,{
+            transform:`scale(${1/trans.scale})`,
+            webkitTransform:`scale(${1/trans.scale})`,
+        });
     }
     if(ops.close || this._ops.close){
         let closeBtn = el.querySelector(`.mt-close-btn`);
-        closeBtn.style.transform = `scale(${1/trans.scale})`;
-        closeBtn.style.webkitTransform = `scale(${1/trans.scale})`;
+        _.setStyle(closeBtn,{
+            transform:`scale(${1/trans.scale})`,
+            webkitTransform:`scale(${1/trans.scale})`,
+        });
     }
     window.requestAnimFrame(()=>{
         _.setPos(el, trans);
@@ -571,6 +659,7 @@ Touchkit.prototype._insertCss = function(){
     _.addCssRule('.mt-active .mtouch-singleButton,.mt-active .mt-close-btn','display: inline-block;');
     _.addCssRule('.mt-child','position:absolute;text-align:left;');
     _.addCssRule('.mt-image','width:100%;height:100%;position:absolute;text-align:left;');
-    _.addCssRule('.mt-close-btn','position:absolute;width:30px;height:30px;top:-15px;right:-15px;background-size:100%;display:none;');
+    _.addCssRule('.mt-close-btn',`position:absolute;width:30px;height:30px;top:-15px;right:-15px;background-size:100%;display:none;background-image:url(${removeBtn})`);
     _.addCssRule('.mt-background','position:absolute;left:0;top:0;');
+    _.addCssRule('.mt-crop-box','position:absolute;left:5px;top:5px;width:90%;height:90%;border:2px dashed #996699;box-sizing:border-box;z-index:20;');
 };

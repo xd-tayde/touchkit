@@ -6,6 +6,7 @@ var _typeof$1 = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "s
     return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
 };
 
+var sheet = void 0;
 var _ = {
     getLength: function getLength(v1) {
         if ((typeof v1 === 'undefined' ? 'undefined' : _typeof$1(v1)) !== 'object') {
@@ -163,8 +164,23 @@ var _ = {
             };
         }
         return JSON.parse(el.getAttribute('data-mtouch-status')) || defaulTrans;
+    },
+    addCssRule: function addCssRule(selector, rules) {
+        if (!sheet) {
+            sheet = createStyleSheet();
+        }
+        sheet.insertRule(selector + '{' + rules + '}', sheet.rules.length);
     }
 };
+
+function createStyleSheet() {
+    var style = document.createElement('style');
+    style.type = 'text/css';
+    document.head.appendChild(style);
+    return style.sheet;
+}
+
+var base64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyppVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTMyIDc5LjE1OTI4NCwgMjAxNi8wNC8xOS0xMzoxMzo0MCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTUuNSAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo3QUY3RkU4M0E5OEIxMUU2QjU0QTkxRjBDMUE2RDg3NCIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo3QUY3RkU4NEE5OEIxMUU2QjU0QTkxRjBDMUE2RDg3NCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjdBRjdGRTgxQTk4QjExRTZCNTRBOTFGMEMxQTZEODc0IiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjdBRjdGRTgyQTk4QjExRTZCNTRBOTFGMEMxQTZEODc0Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+ckj5SQAAA5tJREFUeNrsm0tIVUEYx7+TSuHVIk2sjfTQTaQLo425KXq3yF7gwrASwozKVmG0DNoElUQgYRQECT0JKum1SjeRkFaLnuAmpCxIrxkit//X/W7dpOu9Z+acmSOeD34oepn5fs6Z15nRicViNJ1iBk2zCIVD4VB4akd2ql/UnvGk/CJQBSpBKVgE5oE8+f0w+AI+gnegB3TJz7Sio9mlsEYUgO1COXAm+WyesBCskp/xPNkHbghfjbSwQhSDw/xwgFka5fAfqEJoAVdBKxgISh/OAU3gKditKTsxuKw9UnaT1GVVmPvkXXAcRHwcayJSx31QZkt4HegEywwOskvBPanbqHA9aAf5FmaWiNRdb0q4DpwEWRan0yzJoc5v4Q1SUVCCc1nvlzAPUGctt+z/WrpVcvNUmKeDNkt9Nl3kS27ZXgrvNzwauw3ObZ9XK635oDmDteuCdJ+5/YyGOrp+r5/9iCOyFB3QbeFGL1ZPPssmpqtG3Ue6QGXotyCbiF1gro7wDpCrKTtsSJYk1506wtu0n7OZ5DhmB7CtqsJFsp/VirUVFNm7mmYblK6QlwyuhavSbN4n7bMPeylqSdqR3F1PS5U6A5STJJv89eIT+m7g1f9ycMdtC5epyibe07CcpZYuVXmkS3SnHovSJSrChW5qSDX1WJIuVBHO9ar2hPSjPmPSuX684nEt3f7YqLRr4ZEpLD2iIjwYlJauXel6Hz6oItwfhMebZWtW/DmayTT6VYTf2u7TirIc71RWWj2mBjL+fk35vyuy6E+KKcpyPFcR7pacHFvSGkV2qzzSnyl+imdlytKIXprkuDXdPHzT5DwdHSUv9hW3dF4AXAc/TAjzALVFvc8mgnO9piPMh9EdJmRr9GVJcv2mI8xxDoxOAVnu/63pPpTJe+lPFD9iOeqHMHZZvK0c8qCo05TBLYFMNw/nwWsKbrwCF3Q3D8kxRvErB9EAynJOByRHz4Q53oBDYDxAspzLQcmNvBbm4DsWLQES5lw6vdoPp4orUtG45ZZtkVzIb2GOy6CByNgRysQ+2yA5kClhjgcUvwLx0qAszxSbpG4yLczxAWwGJ3wewaNSx0bdfboXL/HGZJ6uBpc8XpWNSpnVUseYboFe3rXkVc4xcIriR5Z8ipfucmmqjVOv7NQCfbk0ecPRJhRL6/CJ3hKwGMyh+A3aHPp7fZi7xnvwguLXhwf86htO+F8toXAoHAqHwgGOXwIMAGwpGJYKZlZqAAAAAElFTkSuQmCC";
 
 var _createClass = function () {
     function defineProperties(target, props) {
@@ -229,32 +245,6 @@ var HandlerBus = function () {
     return HandlerBus;
 }();
 
-var _slicedToArray = function () {
-    function sliceIterator(arr, i) {
-        var _arr = [];var _n = true;var _d = false;var _e = undefined;try {
-            for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
-                _arr.push(_s.value);if (i && _arr.length === i) break;
-            }
-        } catch (err) {
-            _d = true;_e = err;
-        } finally {
-            try {
-                if (!_n && _i["return"]) _i["return"]();
-            } finally {
-                if (_d) throw _e;
-            }
-        }return _arr;
-    }return function (arr, i) {
-        if (Array.isArray(arr)) {
-            return arr;
-        } else if (Symbol.iterator in Object(arr)) {
-            return sliceIterator(arr, i);
-        } else {
-            throw new TypeError("Invalid attempt to destructure non-iterable instance");
-        }
-    };
-}();
-
 var EVENT$1 = ['touchstart', 'touchmove', 'touchend', 'drag', 'dragstart', 'dragend', 'pinch', 'pinchstart', 'pinchend', 'rotate', 'rotatestart', 'rotatend', 'singlePinchstart', 'singlePinch', 'singlePinchend', 'singleRotate', 'singleRotatestart', 'singleRotatend'];
 
 var ORIGINEVENT = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
@@ -287,6 +277,8 @@ function MTouch() {
     this.vector1 = {};
     this.singleBasePoint = {};
 
+    // 插入css;
+    this._css();
     // 初始化注册事件队列；
     this._driveBus();
     // 监听原生 touch 事件；
@@ -400,7 +392,9 @@ MTouch.prototype._move = function (ev) {
             singlePinchLength = _.getLength(pinchV2);
             this._eventFire('singlePinch', {
                 delta: {
-                    scale: singlePinchLength / this.singlePinchStartLength
+                    scale: singlePinchLength / this.singlePinchStartLength,
+                    deltaX: curPoint.x - this.startPoint.x,
+                    deltaY: curPoint.y - this.startPoint.y
                 },
                 origin: ev
             });
@@ -474,17 +468,9 @@ MTouch.prototype._eventEnd = function (evName, ev) {
 // 添加 button 区域；
 // 背景样式由业务方定制；
 MTouch.prototype._addButton = function (el) {
-    var _$domify = _.domify('<div class="mtouch-singleButton" data-singleButton=\'true\' style=\'position:absolute;right:-15px;bottom: -15px;width:30px;height: 30px;background-size: 100% 100%;\'></div>'),
-        _$domify2 = _slicedToArray(_$domify, 1),
-        button = _$domify2[0],
-        _style = void 0;
-
+    var button = _.domify('<div class="mtouch-singleButton" data-singleButton=\'true\'></div>')[0];
     el.appendChild(button);
     el.setAttribute('data-mtouch-addButton', true);
-    if (getComputedStyle && window.getComputedStyle(el, null).position === 'static') {
-        _style = el.style || '';
-        el.style = _style + 'position:relative';
-    }
 };
 // 切换 operator;
 MTouch.prototype.switch = function (el) {
@@ -522,6 +508,10 @@ MTouch.prototype._on = function (evName, handler, operator) {
 };
 MTouch.prototype.off = function (evName, handler) {
     this[evName].del(handler);
+};
+
+MTouch.prototype._css = function () {
+    _.addCssRule('.mtouch-singleButton', 'position:absolute;right:-15px;bottom: -15px;width:30px;height: 30px;background-size: 100% 100%;background-image:url(' + base64 + ');');
 };
 
 var _typeof2$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -587,17 +577,18 @@ var _$1 = {
     }
 };
 
-function MCanvas(cwidth, cheight) {
+function MCanvas(cwidth, cheight, background) {
 
     // 兼容不使用 new 的方式；
-    if (!(this instanceof MCanvas)) return new MCanvas(cwidth, cheight);
+    if (!(this instanceof MCanvas)) return new MCanvas(cwidth, cheight, background);
 
     // 配置canvas初始大小；
     // cwidth：画布宽度，Number,选填，默认为 500;
     // cheight: 画布高度，Number，选填，默认与宽度一致；
     this.ops = {
         width: cwidth || 500,
-        height: cheight || cwidth
+        height: cheight || cwidth,
+        background: background
     };
     // 全局画布；
     this.canvas = null;
@@ -623,6 +614,10 @@ MCanvas.prototype._init = function () {
     this.canvas.width = this.ops.width;
     this.canvas.height = this.ops.height;
     this.ctx = this.canvas.getContext('2d');
+    if (this.ops.background) {
+        this.ctx.fillStyle = this.ops.background;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
 };
 
 // --------------------------------------------------------
@@ -1170,16 +1165,20 @@ MCanvas.prototype._next = function () {
     }
 };
 
+var base64$1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAABEBJREFUeNrsm01IVFEUx9+MpVMzgVrhLoqshdWMTq1GXbQpo1Vf0GChs6gk+sCFzUYwZMQaUTEQwYIQQ4Q+pEUfth5caCaYtCjLaJVkmajTSMh0DnMHJJ/v49x3573ROfAHec579/zmzpyPe+/Y4vG4tJHMLm0wywBngNeZbZK7WFZWtm4AI5GIOrCBtgPkAx0GFYJ2gbaDtrL/R0E/Qd9Ak6BR0BBoJqUzzGl5oHOgUyA3yKbw2mxQLmgv6CjoEgjz5DhoAPQYNGtV4AJQDejiihmkGL5BHqYgqB90DzRtlaCFb9pV/LqArnDC/m9bQAH2bBxjs9nAe0AvQfUgp8BY4GRj4Fj7zQI+DnoNOpjCoHsA9AJUkWrgC6AHoG0mZBqc7fvMh5QAV4HCoCwT02sW86FKNPAxUMhCdUWI+SQEeB+o0+SZlZvpTuabocCYDroER2Ke73SX1pSlFRgroCILl8xFzEdDgLGCqk2DPqGW+coNfMOiH2W5j/ZNXuB8kD+NusHzzGcy8BmQQ++ogUDANTg4WNDc3JzncDhsWu/D14bD4Ty8t7q62kUAdjCfuYB1W2VlpcvpdNrLy8sdLS0tmqDxNa2trfk+n8+B9/r9fhdxlk9TgbF5P0QZcXh4eCn5d0lJSY4adBLW4/FkJ6+NjIzEiMBupeClBFyq0ryvaY2Njb/HxsY0QcvBjo6OLoVCoTmOfrqUAuylRo5YLBavq6ubVYNeCzYYDM7iMziCl4cCXMgTLtWgBcJKbMlIfvrltlrYqiUupu3mzRMIhpAIm7yGb4LdbrcJgkX7KiUWD1etWqoFLW5ba6YFwir6rgTsMmhwWWiBsIq+p3TnAT/GMtdEDPWXArxg1OhyAUpPnibYAgV4xijYtra2VdFYa54m2hwFeMooWLfbvSpAacnTHPaFAjwpChYDlNbihGifKcDvRMHqrcgINk4BxsKDlCqamppy1WDVoBsaGnKJsDhGhAL8A/SeMmJxcXGOnjwrB+31enOIwOjzNDUPP6WM2NvbuxCNRuNQ1sW0FhVJaLwH7+3r65snAg8otlIKtXRyiectZdXDJMMe+gjoV/KCnlpaYjf2p9GaVv9KWGpp2QFaTAPYRearxAuMAaA9DYDbJQ2nBLRW7rg9OWFh2Anmo2QUMHYfeJxh3oKw2CjUKHVI1PYQa+vroGULwaIv15RqZ95++I2UOGthFatnPkmigNF6QLdMnull5kOP7kUI4oCPpMT2pBnfaUw/l5kPUqqA0fAET0WKo/cH0EnQK/IyE6cDU8yBO6ysE1ky3gWdAH3keZARK2iYDvBoIK4Dd0uJA6NG2R/QQymxddKhNfUomZFnLb+DbjP4s1JiFw834/Q28nHW4j0DPVGrjc0EXtlwdDPtZDOP+1R40kbp+PAntsoyxHpxISb6vDQ6/pzJErbhfgJgy/xuKQOcAU5r+yfAAGDyyaocNx08AAAAAElFTkSuQmCC";
+
 var _typeof$3 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var sheet = void 0;
+var sheet$1 = void 0;
 var _$2 = {
     setPos: function setPos(el, transform) {
         var str = JSON.stringify(transform);
         var value = 'translate3d(' + transform.x + 'px,' + transform.y + 'px,0px) scale(' + transform.scale + ') rotate(' + transform.rotate + 'deg)';
         el = this.getEl(el);
-        el.style.transform = value;
-        el.style.webkitTransform = value;
+        this.setStyle(el, {
+            transform: value,
+            webkitTransform: value
+        });
         el.setAttribute('data-mtouch-status', str);
     },
     getPos: function getPos(el) {
@@ -1262,6 +1261,11 @@ var _$2 = {
         }
         return _el;
     },
+    setStyle: function setStyle(el, ops) {
+        this.forin(ops, function (k, v) {
+            el.style[k] = v;
+        });
+    },
     addClass: function addClass(el, cls) {
         var _cls = void 0;
         el = this.getEl(el);
@@ -1298,6 +1302,11 @@ var _$2 = {
                 cbk(k, obj[k]);
             }
         }
+    },
+    xRatio: function xRatio(pos, ratio) {
+        pos.x *= ratio;
+        pos.y *= ratio;
+        return pos;
     },
     data: function data(el, key, value) {
         el = this.getEl(el);
@@ -1348,10 +1357,10 @@ var _$2 = {
         });
     },
     addCssRule: function addCssRule(selector, rules) {
-        if (!sheet) {
-            sheet = createStyleSheet();
+        if (!sheet$1) {
+            sheet$1 = createStyleSheet$1();
         }
-        sheet.insertRule(selector + '{' + rules + '}', sheet.rules.length);
+        sheet$1.insertRule(selector + '{' + rules + '}', sheet$1.rules.length);
     },
     remove: function remove(el) {
         var _par = el.parentNode || el.parentElement;
@@ -1393,7 +1402,7 @@ var _$2 = {
     }
 };
 
-function createStyleSheet() {
+function createStyleSheet$1() {
     var style = document.createElement('style');
     style.type = 'text/css';
     document.head.appendChild(style);
@@ -1529,14 +1538,17 @@ function Touchkit(ops) {
         width: this.el.clientWidth || this.el.offsetWidth,
         height: this.el.clientHeight || this.el.offsetHeight
     };
+
+    this._cropBox = false;
+
+    this._insertCss();
+
     this._init();
 
     // 初始化mtouch；
     this.mt = MTouch(this.el);
 
     this._bind();
-
-    this._insertCss();
 }
 
 Touchkit.prototype._init = function () {
@@ -1568,9 +1580,8 @@ Touchkit.prototype.background = function (ops) {
         left: 0,
         top: 0,
         // 在type=crop时使用，背景图只需启动拖动操作；
-        use: {
-            drag: true
-        }
+        use: {},
+        static: false
     };
     _ops = _$2.extend(_ops, ops);
     _$2.getImage(_ops.image, function (img) {
@@ -1608,6 +1619,13 @@ Touchkit.prototype.background = function (ops) {
                 height = ph;
                 ratio = ih / height;
             }
+            if (!ops.static) {
+                _ops.use = {
+                    drag: true,
+                    pinch: true,
+                    rotate: true
+                };
+            }
         } else if (_ops.type == 'crop') {
             left = 0;
             top = 0;
@@ -1628,14 +1646,23 @@ Touchkit.prototype.background = function (ops) {
                 maxScale: 1,
                 minScale: 1
             };
+            if (!ops.static) {
+                _ops.use = {
+                    drag: true
+                };
+            }
         }
-        img.style = 'width:' + width + 'px;height:' + height + 'px;left:' + left + 'px;top:' + top + 'px';
+        _$2.setStyle(img, {
+            width: width + 'px',
+            height: height + 'px',
+            transform: 'translate(' + left + 'px,' + top + 'px)',
+            webkitTransform: 'translate(' + left + 'px,' + top + 'px)'
+        });
+
         _this.el.appendChild(img);
 
         // 记录背景图参数；
         _ops.ratio = ratio;
-        _ops.left = left;
-        _ops.top = top;
 
         _this._childs.background = {
             el: img,
@@ -1688,7 +1715,11 @@ Touchkit.prototype._add = function (img, ops) {
         originHeight = originWidth / iratio;
     var spaceX = (ops.pos.scale - 1) * originWidth / 2,
         spaceY = (ops.pos.scale - 1) * originHeight / 2;
-    _ele.style = 'width:' + originWidth + 'px;height:' + originHeight + 'px';
+    _$2.setStyle(_ele, {
+        width: originWidth + 'px',
+        height: originHeight + 'px'
+    });
+
     _$2.addClass(_templateEl, 'mt-image');
     _ele.appendChild(_templateEl);
     // 是否添加关闭按钮；
@@ -1718,23 +1749,54 @@ Touchkit.prototype._add = function (img, ops) {
     });
     this._childIndex++;
 };
+Touchkit.prototype.cropBox = function () {
+    var cropBox = _$2.domify('<div class="mt-crop-box" data-mt-index="cropBox"><div class="mt-close-btn"></div></div>')[0];
+    this.el.appendChild(cropBox);
+    this.switch(cropBox);
+    this._cropBox = true;
+    this._childs['cropBox'] = {
+        el: cropBox,
+        ops: {
+            width: cropBox.offsetWidth,
+            height: cropBox.offsetHeight,
+            use: {
+                drag: true,
+                pinch: false,
+                rotate: false,
+                singlePinch: true,
+                singleRotate: false
+            },
+            limit: {
+                x: 0,
+                y: 0,
+                maxScale: 1,
+                minScale: 0.2
+            }
+        }
+    };
+};
 // 使用 mcanvas 合成图片后导出 base64;
 Touchkit.prototype.exportImage = function (cbk) {
+    var _this3 = this;
+
     var cwidth = this.elStatus.width,
         cheight = this.elStatus.height;
     var bg = this._childs.background;
-    var bgLeft = void 0,
-        bgTop = void 0;
     var ratio = bg.ops.ratio;
-    var mc = new MCanvas(cwidth * ratio, cheight * ratio);
-    var addChilds = [];
+    var bgPos = _$2.xRatio(_$2.getPos(bg.el), ratio);
+    var mc = new MCanvas(cwidth * ratio, cheight * ratio, '#ffffff');
+    var addChilds = [{
+        image: bg.el,
+        options: {
+            width: bg.el.width * ratio,
+            pos: bgPos
+        }
+    }];
     this._zIndexBox.zIndexArr.forEach(function (v) {
         var child = document.querySelector('#' + v);
         var image = child.querySelector('.mt-image');
-        var childPos = JSON.parse(_$2.data(child, 'mtouch-status'));
+        var childPos = _$2.xRatio(_$2.getPos(child), ratio);
         var width = image.clientWidth || image.offsetWidth;
-        childPos.x *= ratio;
-        childPos.y *= ratio;
         addChilds.push({
             image: image,
             options: {
@@ -1743,62 +1805,75 @@ Touchkit.prototype.exportImage = function (cbk) {
             }
         });
     });
-    if (bg.ops.type == 'crop') {
-        var bgPos = JSON.parse(_$2.data(bg.el, 'mtouch-status')) || { left: 0, top: 0, scale: 1, rotate: 0 };
-        bgLeft = -bgPos.x;
-        bgTop = -bgPos.y;
-    } else {
-        bgLeft = bg.ops.left;
-        bgTop = bg.ops.top;
-    }
-    mc.background({
-        image: bg.el,
-        type: bg.ops.type,
-        left: bgLeft * ratio,
-        top: bgTop * ratio
-    }).add(addChilds).draw(function (b64) {
-        cbk(b64);
+    mc.add(addChilds).draw(function (b64) {
+        if (_this3._cropBox) {
+            var cropBoxOps = _this3._childs.cropBox;
+            var cropBox = cropBoxOps.el;
+            var cropBoxPos = _$2.getPos(cropBox);
+            _$2.getImage(b64, function (img) {
+                var cMc = new MCanvas(cropBoxOps.ops.width * ratio, cropBoxOps.ops.height * ratio);
+                cMc.add(img, {
+                    width: img.naturalWidth,
+                    pos: {
+                        x: -cropBoxPos.x * ratio,
+                        y: -cropBoxPos.y * ratio,
+                        scale: 1,
+                        rotate: 0
+                    }
+                }).draw(function (base64) {
+                    cbk(base64);
+                });
+            });
+        } else {
+            cbk(b64);
+        }
     });
 };
 
 Touchkit.prototype._bind = function () {
-    var _this3 = this;
+    var _this4 = this;
 
     // 绑定所有事件；
     EVENT.forEach(function (evName) {
-        if (!_this3[evName]) {
-            _this3[evName] = function () {
-                _this3._ops.event[evName]();
+        if (!_this4[evName]) {
+            _this4[evName] = function () {
+                _this4._ops.event[evName]();
             };
         }
-        _this3.mt.on(evName, _this3[evName].bind(_this3));
+        _this4.mt.on(evName, _this4[evName].bind(_this4));
     });
 
     // 点击子元素外的区域失去焦点；
     this.el.addEventListener('click', function (ev) {
-        if (!_this3._isAdd(ev.target)) {
-            _this3.switch(null);
+        if (!_this4._isAdd(ev.target)) {
+            _this4.switch(null);
         }
         // 如果背景为裁剪模式，则切换到操作背景图；
-        if (_$2.hasClass(ev.target, 'mt-background') && _$2.data(ev.target, 'mt-bg-type') == 'crop') {
-            _this3.switch(ev.target);
+        if (_$2.hasClass(ev.target, 'mt-background') || _$2.hasClass(ev.target, 'mt-crop-box')) {
+            _this4.switch(ev.target);
         }
     });
 
     // 切换子元素；
     _$2.delegate(this.el, 'click', '.mt-child', function (ev) {
         var el = ev.delegateTarget,
-            _ops = _this3._getOperatorOps(el),
-            _addButton = _ops.use.singlePinch || _this3._ops.use.singlePinch || _ops.use.singleRotate || _this3._ops.use.singleRotate ? true : false;
-        _this3.switch(el, _addButton);
-        _this3._zIndexBox.toTop(el.id);
+            _ops = _this4._getOperatorOps(el),
+            _addButton = _ops.use.singlePinch || _this4._ops.use.singlePinch || _ops.use.singleRotate || _this4._ops.use.singleRotate ? true : false;
+        _this4.switch(el, _addButton);
+        _this4._zIndexBox.toTop(el.id);
     });
 
     // 关闭按钮事件；
     _$2.delegate(this.el, 'click', '.mt-close-btn', function (ev) {
         var _el = ev.delegateTarget;
         var _child = _el.parentNode || _el.parentElement;
-        _this3._zIndexBox.removeIndex(_child.id);
+        var index = _$2.data(_child, 'mt-index');
+        if (index == 'cropBox') {
+            _this4.switch(null);
+            _this4._cropBox = false;
+        } else {
+            _this4._zIndexBox.removeIndex(_child.id);
+        }
         _$2.remove(_child);
     });
 };
@@ -1854,9 +1929,25 @@ Touchkit.prototype.singlePinch = function (ev) {
     if (!this.freezed) {
         if (this.operator) {
             var ops = this._getOperatorOps();
-            if (ops.use.singlePinch || this._ops.use.singlePinch) {
-                this.transform.scale *= ev.delta.scale;
-                this._setTransform();
+            if (_$2.data(this.operator, 'mt-index') == 'cropBox') {
+                if (ops.use.singlePinch || this._ops.use.singlePinch) {
+                    var cropBoxPos = _$2.getPos(this.operator);
+                    if (ops.width + ev.delta.deltaX + cropBoxPos.x < this.elStatus.width) {
+                        ops.width += ev.delta.deltaX;
+                    }
+                    if (ops.height + ev.delta.deltaY + cropBoxPos.y < this.elStatus.height) {
+                        ops.height += ev.delta.deltaY;
+                    }
+                    _$2.setStyle(this.operator, {
+                        width: ops.width + 'px',
+                        height: ops.height + 'px'
+                    });
+                }
+            } else {
+                if (ops.use.singlePinch || this._ops.use.singlePinch) {
+                    this.transform.scale *= ev.delta.scale;
+                    this._setTransform();
+                }
             }
         }
         this._ops.event.singlePinch(ev);
@@ -1899,18 +1990,24 @@ Touchkit.prototype._setTransform = function () {
     }
     if (ops.use.singlePinch || this._ops.use.singlePinch) {
         var singlePinchBtn = el.querySelector('.mtouch-singleButton');
-        singlePinchBtn.style.transform = 'scale(' + 1 / trans.scale + ')';
-        singlePinchBtn.style.webkitTransform = 'scale(' + 1 / trans.scale + ')';
+        _$2.setStyle(singlePinchBtn, {
+            transform: 'scale(' + 1 / trans.scale + ')',
+            webkitTransform: 'scale(' + 1 / trans.scale + ')'
+        });
     }
     if (ops.use.singleRotate || this._ops.use.singleRotate) {
         var singleRotateBtn = el.querySelector('.mtouch-singleButton');
-        singleRotateBtn.style.transform = 'scale(' + 1 / trans.scale + ')';
-        singleRotateBtn.style.webkitTransform = 'scale(' + 1 / trans.scale + ')';
+        _$2.setStyle(singleRotateBtn, {
+            transform: 'scale(' + 1 / trans.scale + ')',
+            webkitTransform: 'scale(' + 1 / trans.scale + ')'
+        });
     }
     if (ops.close || this._ops.close) {
         var closeBtn = el.querySelector('.mt-close-btn');
-        closeBtn.style.transform = 'scale(' + 1 / trans.scale + ')';
-        closeBtn.style.webkitTransform = 'scale(' + 1 / trans.scale + ')';
+        _$2.setStyle(closeBtn, {
+            transform: 'scale(' + 1 / trans.scale + ')',
+            webkitTransform: 'scale(' + 1 / trans.scale + ')'
+        });
     }
     window.requestAnimFrame(function () {
         _$2.setPos(el, trans);
@@ -2066,8 +2163,9 @@ Touchkit.prototype._insertCss = function () {
     _$2.addCssRule('.mt-active .mtouch-singleButton,.mt-active .mt-close-btn', 'display: inline-block;');
     _$2.addCssRule('.mt-child', 'position:absolute;text-align:left;');
     _$2.addCssRule('.mt-image', 'width:100%;height:100%;position:absolute;text-align:left;');
-    _$2.addCssRule('.mt-close-btn', 'position:absolute;width:30px;height:30px;top:-15px;right:-15px;background-size:100%;display:none;');
+    _$2.addCssRule('.mt-close-btn', 'position:absolute;width:30px;height:30px;top:-15px;right:-15px;background-size:100%;display:none;background-image:url(' + base64$1 + ')');
     _$2.addCssRule('.mt-background', 'position:absolute;left:0;top:0;');
+    _$2.addCssRule('.mt-crop-box', 'position:absolute;left:5px;top:5px;width:90%;height:90%;border:2px dashed #996699;box-sizing:border-box;z-index:20;');
 };
 
 export default Touchkit;

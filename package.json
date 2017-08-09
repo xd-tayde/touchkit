@@ -1,8 +1,16 @@
 {
-  "name": "@meitu/touchkit",
-  "version": "1.0.1",
+  "name": "touchkit",
+  "version": "1.1.2",
   "description": "a touch kit based on mtouch,it make you create a gesture app more quickly and simply",
-  "keywords":["touch","hammer","finger","sticker","image-composer","image-croper","gesture"],
+  "keywords": [
+    "touch",
+    "hammer",
+    "finger",
+    "sticker",
+    "image-composer",
+    "image-croper",
+    "gesture"
+  ],
   "main": "dist/touchkit.js",
   "module": "dist/touchkit.es.js",
   "moduleName": "Touchkit",
@@ -38,7 +46,7 @@
     "rollup-watch": "^3.2.2"
   },
   "dependencies": {
-    "@meitu/mcanvas": "^1.1.3",
-    "@meitu/mtouch": "^3.0.3"
+    "mcanvas": "^1.1.4",
+    "mtouch": "^3.0.6"
   }
 }

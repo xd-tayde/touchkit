@@ -2,36 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>meitu-touchkit</title>
     <link rel="stylesheet" href="./main.css">
     <script>
-        (function(m, n) {
-            var o = navigator.userAgent,
-                p = /android|adr/gi.test(o),
-                j = /iphone|ipod|ipad/gi.test(o) && !p;
-            var k = n.documentElement;
-            var l = function() {
-                    var a = k.getBoundingClientRect().width || 320;
-                    var b = a / 320 * 20;
-                    b = b > 40 ? 40 : b;
-                    k.style.fontSize = b + "px";
-                    window.fontSize = b
-                },
-                i;
-            m.addEventListener("resize", function() {
-                clearTimeout(i);
-                i = setTimeout(l, 100)
-            }, false);
-            m.addEventListener("pageshow", function(a) {
-                if (a.persisted) {
-                    clearTimeout(i);
-                    i = setTimeout(l, 100)
-                }
-            }, false);
-            l()
-        })(window, document);
+        ;(function(win,doc){
+        var docEl = doc.documentElement,
+            UA    = navigator.userAgent,
+            isMeitu = /meitu|meipai/gi.test(UA);
+        var refreshRem =function (){
+            var w =docEl.getBoundingClientRect().width || 320;
+            var fontSize = w/320 * 20;
+            fontSize = fontSize > 40 ? 40 : fontSize;
+            docEl.style.fontSize = fontSize+'px';
+            var finalFontSize = parseFloat(win.getComputedStyle(docEl).getPropertyValue("font-size"));
+            if(finalFontSize === fontSize || isMeitu) return;
+            fontSize = fontSize+(fontSize-finalFontSize);
+            docEl.style.fontSize = fontSize+'px';
+            win.fontSize = fontSize;
+        },refreshRemId;
+        win.addEventListener('resize', function() {
+            clearTimeout(refreshRemId);
+            refreshRemId = setTimeout(refreshRem, 100);
+        }, false);
+        win.addEventListener('pageshow', function(e) {
+            if (e.persisted) {
+                clearTimeout(refreshRemId);
+                refreshRemId = setTimeout(refreshRem, 100);
+            }
+        }, false);
+        refreshRem();
+        })(window,document);
     </script>
 </head>
 <body>
@@ -39,14 +41,14 @@
     <h1 class="title">touchkit.js</h1>
     <div class="wrap js-wrap">
         <div class="item sticker">
-            <h2 class="sub-title">( please use in mobile or device mode! )</h2>
             <div class="parent js-par"></div>
             <div class="tips">
                 Tips:<br/>you can select any widget to operate it and tap the background to move the background-image!
             </div>
         </div>
     </div>
-    <div class="btn js-btn Button">exportImage</div>
+    <div class="export js-export Button">exportImage</div>
+    <div class="addCropBox js-cropBox Button">add cropBox</div>
     <div class="result js-result">
         <div class="result-wrap">
             <h2>This is already a image!<br/>you can save this image by longTap!</h2>
@@ -55,6 +57,6 @@
     </div>
 
     <script src="./zepto.min.js"></script>
-    <script src="./dist/example.js"></script>
+    <script src="./dist/example.js?77"></script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 
 [Example](http://f2er.meitu.com/gxd/touchkit/example/index.html)   
 
-[Git](https://gitlab.meitu.com/npm/meitu-touchkit)
+[Git](https://github.com/xd-tayde/touchkit)
 
 [Download](http://f2er.meitu.com/gxd/touchkit/dist/touchkit.min.js)
 
@@ -11,6 +11,14 @@
 该工具包是基于`mtouch.js`的上层封装，比较具有针对性，类似于一些需要手势操作型的项目，一键绑定事件，同时也基于`mcanvas.js`一键合成图片，内部封装复杂的各种逻辑和计算，尽量让业务方关注更少的东西。
 
 ## Change Log
+
+- 1.1.2(8.9)
+    - 修改 demo ，增加裁剪框功能演示；
+    - 将关闭按钮图标内置；
+
+- 1.1.0(8.9)
+    - 增加裁剪框的新功能--`Tk.cropBox()`,可添加一个裁剪框；
+    - 去除内部npm依赖；
 
 - 1.0.1(8.4)
     - 增加全局配置参数；
@@ -241,3 +249,7 @@ params:
 ### 7、`tk.destory()`
 
 销毁手势盒子，保持样式，但失去焦点，且解绑所有事件；
+
+### 8、`tk.cropBox()`
+
+添加一个裁剪框，可对结果图进行裁剪；
