@@ -652,8 +652,13 @@ MCanvas.prototype.background = function (bg) {
 };
 
 MCanvas.prototype._background = function (img, bg) {
+    var _getSize = this._getSize(img),
+        iw = _getSize.iw,
+        ih = _getSize.ih;
     // 图片与canvas的长宽比；
-    var iRatio = img.naturalWidth / img.naturalHeight;
+
+
+    var iRatio = iw / ih;
     var cRatio = this.canvas.width / this.canvas.height;
     // 背景绘制参数；
     var sx = void 0,
@@ -670,10 +675,10 @@ MCanvas.prototype._background = function (img, bg) {
             sx = bg.left || 0;
             sy = bg.top || 0;
             if (iRatio > cRatio) {
-                swidth = img.naturalHeight * cRatio;
-                sheight = img.naturalHeight;
+                swidth = ih * cRatio;
+                sheight = ih;
             } else {
-                swidth = img.naturalWidth;
+                swidth = iw;
                 sheight = swidth / cRatio;
             }
             dy = dx = 0;
@@ -683,8 +688,8 @@ MCanvas.prototype._background = function (img, bg) {
         // 包含模式，固定canvas大小，包含背景图；
         case 'contain':
             sy = sx = 0;
-            swidth = img.naturalWidth;
-            sheight = img.naturalHeight;
+            swidth = iw;
+            sheight = ih;
             if (iRatio > cRatio) {
                 dwidth = this.canvas.width;
                 dheight = dwidth / iRatio;
@@ -700,11 +705,11 @@ MCanvas.prototype._background = function (img, bg) {
         // 原图模式：canvas与原图大小一致，忽略初始化 传入的宽高参数；
         // 同时，background 传入的 left/top 均被忽略；
         case 'origin':
-            this.canvas.width = img.naturalWidth;
-            this.canvas.height = img.naturalHeight;
+            this.canvas.width = iw;
+            this.canvas.height = ih;
             sx = sy = 0;
-            swidth = img.naturalWidth;
-            sheight = img.naturalHeight;
+            swidth = iw;
+            sheight = ih;
             dx = dy = 0;
             dwidth = this.canvas.width;
             dheight = this.canvas.height;
@@ -811,7 +816,11 @@ MCanvas.prototype.add = function () {
 };
 
 MCanvas.prototype._add = function (img, ops) {
-    var ratio = img.naturalWidth / img.naturalHeight;
+    var _getSize2 = this._getSize(img),
+        iw = _getSize2.iw,
+        ih = _getSize2.ih;
+
+    var ratio = iw / ih;
     // 画布canvas参数；
     var cdx = void 0,
         cdy = void 0,
@@ -837,17 +846,18 @@ MCanvas.prototype._add = function (img, ops) {
     var spaceX = void 0,
         spaceY = void 0;
 
-    lcvs.width = img.naturalWidth * lctxScale;
-    lcvs.height = img.naturalHeight * lctxScale;
+    lcvs.width = iw * lctxScale;
+    lcvs.height = ih * lctxScale;
 
     // 从素材canvas的中心点开始绘制；
-    ldx = -img.naturalWidth / 2;
-    ldy = -img.naturalHeight / 2;
-    ldw = img.naturalWidth;
-    ldh = img.naturalHeight;
+    ldx = -iw / 2;
+    ldy = -ih / 2;
+    ldw = iw;
+    ldh = ih;
 
     lctx.translate(lcvs.width / 2, lcvs.height / 2);
     lctx.rotate(ops.pos.rotate);
+
     lctx.drawImage(img, lsx, lsy, lsw, lsh, ldx, ldy, ldw, ldh);
     //
     // lcvs.style = 'width:300px';
@@ -873,14 +883,35 @@ MCanvas.prototype._add = function (img, ops) {
     lcvs = lctx = null;
     this._next();
 };
+
+// 获取宽高，兼容img，canvas
+MCanvas.prototype._getSize = function (img) {
+    var iw = void 0,
+        ih = void 0;
+    if (img.tagName === 'IMG') {
+        iw = img.naturalWidth;
+        ih = img.naturalHeight;
+    } else if (img.tagName === 'CANVAS') {
+        iw = img.width;
+        ih = img.height;
+    } else {
+        iw = img.offsetWidth;
+        ih = img.offsetHeight;
+    }
+    return { iw: iw, ih: ih };
+};
 // 参数加工函数；
 MCanvas.prototype._handleOps = function (ops, img) {
     var cw = this.canvas.width,
-        ch = this.canvas.height,
-        iw = img.naturalWidth,
-        ih = img.naturalHeight;
+        ch = this.canvas.height;
+
+    var _getSize3 = this._getSize(img),
+        iw = _getSize3.iw,
+        ih = _getSize3.ih;
 
     // 图片宽高比；
+
+
     var ratio = iw / ih;
 
     // 根据参数计算后的绘制宽度；
@@ -906,8 +937,8 @@ MCanvas.prototype._handleOps = function (ops, img) {
     // 最大值判定；
     if (crop.x > iw) crop.x = iw;
     if (crop.y > ih) crop.y = ih;
-    maxLsw = img.naturalWidth - crop.x;
-    maxLsh = img.naturalHeight - crop.y;
+    maxLsw = iw - crop.x;
+    maxLsh = ih - crop.y;
     if (crop.width > maxLsw) crop.width = maxLsw;
     if (crop.height > maxLsh) crop.height = maxLsh;
 
@@ -1487,6 +1518,7 @@ var ZIndex = function () {
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var EVENT = ['touchstart', 'touchmove', 'touchend', 'drag', 'dragstart', 'dragend', 'pinch', 'pinchstart', 'pinchend', 'rotate', 'rotatestart', 'rotatend', 'singlePinchstart', 'singlePinch', 'singlePinchend', 'singleRotate', 'singleRotatestart', 'singleRotatend'];
+var noop = function noop() {};
 
 window.requestAnimFrame = function () {
     return window.requestAnimationFrame || window.webkitRequestAnimationFrame || function (callback) {
@@ -1495,6 +1527,8 @@ window.requestAnimFrame = function () {
 }();
 
 function Touchkit(ops) {
+    var _this = this;
+
     // 兼容不使用 new 的方式；
     if (!(this instanceof Touchkit)) return new Touchkit(ops);
 
@@ -1509,27 +1543,12 @@ function Touchkit(ops) {
         },
         limit: false,
         // event
-        event: {
-            touchstart: function touchstart() {},
-            touchmove: function touchmove() {},
-            touchend: function touchend() {},
-            dragstart: function dragstart() {},
-            drag: function drag() {},
-            dragend: function dragend() {},
-            pinchstart: function pinchstart() {},
-            pinch: function pinch() {},
-            pinchend: function pinchend() {},
-            rotatestart: function rotatestart() {},
-            rotate: function rotate() {},
-            rotatend: function rotatend() {},
-            singlePinchstart: function singlePinchstart() {},
-            singlePinch: function singlePinch() {},
-            singlePinchend: function singlePinchend() {},
-            singleRotatestart: function singleRotatestart() {},
-            singleRotate: function singleRotate() {},
-            singleRotatend: function singleRotatend() {}
-        }
+        event: {}
     };
+
+    EVENT.map(function (eventName) {
+        return _this._ops.event[eventName] = noop;
+    });
 
     if ((typeof ops === 'undefined' ? 'undefined' : _typeof(ops)) == 'object') {
         this._ops = _$2.extend(this._ops, ops);
@@ -1573,7 +1592,7 @@ Touchkit.prototype._init = function () {
 };
 
 Touchkit.prototype.background = function (ops) {
-    var _this = this;
+    var _this2 = this;
 
     var _ops = {
         // 背景图片，type: url/HTMLImageElement/HTMLCanvasElement
@@ -1592,12 +1611,14 @@ Touchkit.prototype.background = function (ops) {
     _ops = _$2.extend(_ops, ops);
     _$2.getImage(_ops.image, function (img) {
         // 背景图真实宽高及宽高比；
-        var iw = img.naturalWidth,
-            ih = img.naturalHeight,
-            iratio = iw / ih;
+        var _getSize = _this2._getSize(img),
+            iw = _getSize.iw,
+            ih = _getSize.ih;
+
+        var iratio = iw / ih;
         // 容器宽高及宽高比；
-        var pw = _this.elStatus.width,
-            ph = _this.elStatus.height,
+        var pw = _this2.elStatus.width,
+            ph = _this2.elStatus.height,
             pratio = pw / ph;
 
         var left = void 0,
@@ -1665,12 +1686,12 @@ Touchkit.prototype.background = function (ops) {
             webkitTransform: 'translate(' + left + 'px,' + top + 'px)'
         });
 
-        _this.el.appendChild(img);
+        _this2.el.appendChild(img);
 
         // 记录背景图参数；
         _ops.ratio = ratio;
 
-        _this._childs.background = {
+        _this2._childs.background = {
             el: img,
             ops: _ops
         };
@@ -1679,7 +1700,7 @@ Touchkit.prototype.background = function (ops) {
 };
 
 Touchkit.prototype.add = function (ops) {
-    var _this2 = this;
+    var _this3 = this;
 
     var _ops = {
         image: '',
@@ -1705,16 +1726,27 @@ Touchkit.prototype.add = function (ops) {
 
     ops.forEach(function (v) {
         _$2.getImage(v.image, function (img) {
-            _this2._add(img, _$2.extend(_ops, v));
+            if (v.use == 'all') {
+                v.use = {
+                    drag: true,
+                    pinch: true,
+                    rotate: true,
+                    singlePinch: true,
+                    singleRotate: true
+                };
+            }
+            _this3._add(img, _$2.extend(_ops, v));
         });
     });
     return this;
 };
 
 Touchkit.prototype._add = function (img, ops) {
-    var iw = img.naturalWidth,
-        ih = img.naturalHeight,
-        iratio = iw / ih;
+    var _getSize2 = this._getSize(img),
+        iw = _getSize2.iw,
+        ih = _getSize2.ih;
+
+    var iratio = iw / ih;
     var _templateEl = img;
     var _ele = _$2.domify('<div class="mt-child" id="mt-child-' + this._childIndex + '" data-mt-index="' + this._childIndex + '"></div>')[0];
     var originWidth = this._get('hor', ops.width),
@@ -1782,8 +1814,8 @@ Touchkit.prototype.cropBox = function () {
     };
 };
 // 使用 mcanvas 合成图片后导出 base64;
-Touchkit.prototype.exportImage = function (cbk) {
-    var _this3 = this;
+Touchkit.prototype.exportImage = function (cbk, cropOps) {
+    var _this4 = this;
 
     var cwidth = this.elStatus.width,
         cheight = this.elStatus.height;
@@ -1812,23 +1844,43 @@ Touchkit.prototype.exportImage = function (cbk) {
         });
     });
     mc.add(addChilds).draw(function (b64) {
-        if (_this3._cropBox) {
-            var cropBoxOps = _this3._childs.cropBox;
+        if (_this4._cropBox) {
+            var cropBoxOps = _this4._childs.cropBox;
             var cropBox = cropBoxOps.el;
             var cropBoxPos = _$2.getPos(cropBox);
-            _$2.getImage(b64, function (img) {
-                var cMc = new MCanvas(cropBoxOps.ops.width * ratio, cropBoxOps.ops.height * ratio);
-                cMc.add(img, {
-                    width: img.naturalWidth,
-                    pos: {
-                        x: -cropBoxPos.x * ratio,
-                        y: -cropBoxPos.y * ratio,
-                        scale: 1,
-                        rotate: 0
-                    }
-                }).draw(function (base64) {
-                    cbk(base64);
-                });
+            var corpBoxMc = new MCanvas(cropBoxOps.ops.width * ratio, cropBoxOps.ops.height * ratio);
+            corpBoxMc.add(mc.canvas, {
+                width: mc.canvas.width,
+                pos: {
+                    x: -cropBoxPos.x * ratio,
+                    y: -cropBoxPos.y * ratio,
+                    scale: 1,
+                    rotate: 0
+                }
+            }).draw(function (b64) {
+                cbk(b64);
+            });
+        } else if (cropOps) {
+            var _default = {
+                x: 0,
+                y: 0,
+                width: '100%',
+                height: '100%'
+            };
+            cropOps = _$2.extend(_default, cropOps);
+            cropOps.width = _this4._get('hor', cropOps.width, mc.canvas.width - cropOps.x);
+            cropOps.height = _this4._get('ver', cropOps.height, mc.canvas.height - cropOps.y);
+            var cropMc = new MCanvas(cropOps.width, cropOps.height);
+            cropMc.add(mc.canvas, {
+                width: mc.canvas.width,
+                pos: {
+                    x: -cropOps.x,
+                    y: -cropOps.y,
+                    scale: 1,
+                    rotate: 0
+                }
+            }).draw(function (b64) {
+                cbk(b64);
             });
         } else {
             cbk(b64);
@@ -1837,36 +1889,36 @@ Touchkit.prototype.exportImage = function (cbk) {
 };
 
 Touchkit.prototype._bind = function () {
-    var _this4 = this;
+    var _this5 = this;
 
     // 绑定所有事件；
     EVENT.forEach(function (evName) {
-        if (!_this4[evName]) {
-            _this4[evName] = function () {
-                _this4._ops.event[evName]();
+        if (!_this5[evName]) {
+            _this5[evName] = function () {
+                _this5._ops.event[evName]();
             };
         }
-        _this4.mt.on(evName, _this4[evName].bind(_this4));
+        _this5.mt.on(evName, _this5[evName].bind(_this5));
     });
 
     // 点击子元素外的区域失去焦点；
     this.el.addEventListener('click', function (ev) {
-        if (!_this4._isAdd(ev.target)) {
-            _this4.switch(null);
+        if (!_this5._isAdd(ev.target)) {
+            _this5.switch(null);
         }
         // 如果背景为裁剪模式，则切换到操作背景图；
         if (_$2.hasClass(ev.target, 'mt-background') || _$2.hasClass(ev.target, 'mt-crop-box')) {
-            _this4.switch(ev.target);
+            _this5.switch(ev.target);
         }
     });
 
     // 切换子元素；
     _$2.delegate(this.el, 'click', '.mt-child', function (ev) {
         var el = ev.delegateTarget,
-            _ops = _this4._getOperatorOps(el),
-            _addButton = _ops.use.singlePinch || _this4._ops.use.singlePinch || _ops.use.singleRotate || _this4._ops.use.singleRotate ? true : false;
-        _this4.switch(el, _addButton);
-        _this4._zIndexBox.toTop(el.id);
+            _ops = _this5._getOperatorOps(el),
+            _addButton = _ops.use.singlePinch || _this5._ops.use.singlePinch || _ops.use.singleRotate || _this5._ops.use.singleRotate ? true : false;
+        _this5.switch(el, _addButton);
+        _this5._zIndexBox.toTop(el.id);
     });
 
     // 关闭按钮事件；
@@ -1875,10 +1927,10 @@ Touchkit.prototype._bind = function () {
         var _child = _el.parentNode || _el.parentElement;
         var index = _$2.data(_child, 'mt-index');
         if (index == 'cropBox') {
-            _this4.switch(null);
-            _this4._cropBox = false;
+            _this5.switch(null);
+            _this5._cropBox = false;
         } else {
-            _this4._zIndexBox.removeIndex(_child.id);
+            _this5._zIndexBox.removeIndex(_child.id);
         }
         _$2.remove(_child);
     });
@@ -2113,18 +2165,18 @@ Touchkit.prototype.destory = function () {
 // 兼容 5 种 value 值：
 // x:250, x:'250px', x:'100%', x:'left:250',x:'center',
 // width:100,width:'100px',width:'100%'
-Touchkit.prototype._get = function (drection, str) {
+Touchkit.prototype._get = function (drection, str, par, child) {
     var result = str;
     var k = void 0,
-        par = void 0,
-        child = void 0;
+        _par = void 0,
+        _child = void 0;
     if (document.body && document.body.clientWidth) {
         k = drection == 'hor' ? 'clientWidth' : 'clientHeight';
     } else {
         k = drection == 'hor' ? 'offsetWidth' : 'offsetHeight';
     }
-    par = this.el[k];
-    child = this.operator ? this.operator[k] : 0;
+    _par = par || this.el[k];
+    _child = child || (this.operator ? this.operator[k] : 0);
     if (typeof str === 'string') {
         if (_$2.include(str, ':')) {
             var arr = str.split(':');
@@ -2135,16 +2187,16 @@ Touchkit.prototype._get = function (drection, str) {
                     break;
                 case 'right':
                 case 'bottom':
-                    result = par - +arr[1].replace('px', '') - child;
+                    result = _par - +arr[1].replace('px', '') - _child;
                     break;
                 default:
             }
         } else if (_$2.include(str, 'px')) {
             result = +str.replace('px', '');
         } else if (_$2.include(str, '%')) {
-            result = par * +str.replace('%', '') / 100;
+            result = _par * +str.replace('%', '') / 100;
         } else if (str == 'center') {
-            result = (par - child) / 2;
+            result = (_par - _child) / 2;
         } else {
             result = +str;
         }
@@ -2161,6 +2213,22 @@ Touchkit.prototype._isAdd = function (el) {
         target = target.parentNode;
     }
     return false;
+};
+
+Touchkit.prototype._getSize = function (img) {
+    var iw = void 0,
+        ih = void 0;
+    if (img.tagName === 'IMG') {
+        iw = img.naturalWidth;
+        ih = img.naturalHeight;
+    } else if (img.tagName === 'CANVAS') {
+        iw = img.width;
+        ih = img.height;
+    } else {
+        iw = img.offsetWidth;
+        ih = img.offsetHeight;
+    }
+    return { iw: iw, ih: ih };
 };
 
 Touchkit.prototype._insertCss = function () {

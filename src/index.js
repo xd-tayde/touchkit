@@ -94,9 +94,8 @@ Touchkit.prototype.background = function(ops){
     _ops = _.extend(_ops,ops);
     _.getImage(_ops.image, img => {
         // 背景图真实宽高及宽高比；
-        let iw = img.naturalWidth,
-            ih = img.naturalHeight,
-            iratio = iw / ih;
+        let {iw,ih} = this._getSize(img);
+        let iratio = iw / ih;
         // 容器宽高及宽高比；
         let pw = this.elStatus.width,
             ph = this.elStatus.height,
@@ -217,9 +216,8 @@ Touchkit.prototype.add = function(ops){
 };
 
 Touchkit.prototype._add = function(img,ops){
-    let iw = img.naturalWidth,
-        ih = img.naturalHeight,
-        iratio = iw / ih;
+    let {iw,ih} = this._getSize(img);
+    let iratio = iw / ih;
     let _templateEl = img;
     let _ele = _.domify(`<div class="mt-child" id="mt-child-${this._childIndex}" data-mt-index="${this._childIndex}"></div>`)[0];
     let originWidth = this._get('hor',ops.width),
@@ -319,8 +317,8 @@ Touchkit.prototype.exportImage = function(cbk,cropOps){
             let cropBoxOps = this._childs.cropBox;
             let cropBox = cropBoxOps.el;
             let cropBoxPos = _.getPos(cropBox);
-            let cMc = new MC(cropBoxOps.ops.width * ratio,cropBoxOps.ops.height * ratio);
-            cMc.add(mc.canvas,{
+            let corpBoxMc = new MC(cropBoxOps.ops.width * ratio,cropBoxOps.ops.height * ratio);
+            corpBoxMc.add(mc.canvas,{
                 width:mc.canvas.width,
                 pos:{
                     x: -cropBoxPos.x * ratio,
@@ -328,12 +326,31 @@ Touchkit.prototype.exportImage = function(cbk,cropOps){
                     scale:1,
                     rotate:0,
                 },
-            }).draw(base64=>{
-                cbk(base64);
+            }).draw(b64=>{
+                cbk(b64);
             });
-            // _.getImage(b64,img=>{
-            //
-            // });
+        }else if(cropOps){
+            let _default = {
+                x:0,
+                y:0,
+                width:'100%',
+                height:'100%',
+            };
+            cropOps = _.extend(_default,cropOps);
+            cropOps.width = this._get('hor',cropOps.width,(mc.canvas.width-cropOps.x));
+            cropOps.height = this._get('ver',cropOps.height,(mc.canvas.height-cropOps.y));
+            let cropMc = new MC(cropOps.width,cropOps.height);
+            cropMc.add(mc.canvas,{
+                width:mc.canvas.width,
+                pos:{
+                    x: -cropOps.x ,
+                    y: -cropOps.y,
+                    scale:1,
+                    rotate:0,
+                },
+            }).draw(b64=>{
+                cbk(b64);
+            });
         }else{
             cbk(b64);
         }
@@ -611,16 +628,16 @@ Touchkit.prototype.destory = function(){
 // 兼容 5 种 value 值：
 // x:250, x:'250px', x:'100%', x:'left:250',x:'center',
 // width:100,width:'100px',width:'100%'
-Touchkit.prototype._get = function(drection,str){
+Touchkit.prototype._get = function(drection,str,par , child){
     let result = str;
-    let k,par,child;
+    let k,_par,_child;
     if(document.body && document.body.clientWidth){
         k = drection == 'hor' ? 'clientWidth':'clientHeight';
     }else{
         k = drection == 'hor' ? 'offsetWidth' : 'offsetHeight';
     }
-    par = this.el[k];
-    child = this.operator ? this.operator[k] : 0;
+    _par = par || this.el[k];
+    _child = child || (this.operator ? this.operator[k] : 0);
     if(typeof str === 'string'){
         if(_.include(str,':')){
             let arr = str.split(':');
@@ -631,16 +648,16 @@ Touchkit.prototype._get = function(drection,str){
                     break;
                 case 'right':
                 case 'bottom':
-                    result = par - (+(arr[1].replace('px',''))) - child;
+                    result = _par - (+(arr[1].replace('px',''))) - _child;
                     break;
                 default:
             }
         }else if (_.include(str,'px')) {
             result = (+str.replace('px', ''));
         } else if (_.include(str,'%')) {
-            result = par * (+str.replace('%', '')) / 100;
+            result = _par * (+str.replace('%', '')) / 100;
         }else if(str == 'center'){
-            result = (par-child)/2;
+            result = (_par-_child)/2;
         }else{
             result = +str;
         }
@@ -657,6 +674,21 @@ Touchkit.prototype._isAdd = function(el){
         target = target.parentNode;
     }
     return false;
+};
+
+Touchkit.prototype._getSize = function(img){
+    let iw,ih;
+    if(img.tagName === 'IMG'){
+        iw = img.naturalWidth;
+        ih = img.naturalHeight;
+    }else if(img.tagName === 'CANVAS'){
+        iw = img.width;
+        ih = img.height;
+    }else{
+        iw = img.offsetWidth;
+        ih = img.offsetHeight;
+    }
+    return{iw,ih};
 };
 
 Touchkit.prototype._insertCss = function(){

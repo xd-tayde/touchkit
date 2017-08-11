@@ -1,16 +1,21 @@
-# 手势操作工具包 Touchkit.js
+# Touchkit.js
 
 [Example](http://f2er.meitu.com/gxd/touchkit/example/index.html)   
 
 [Git](https://github.com/xd-tayde/touchkit)
 
-[Download](http://f2er.meitu.com/gxd/touchkit/dist/touchkit.min.js)
+[Download](https://github.com/xd-tayde/touchkit/blob/master/dist/touchkit.min.js)
 
 ## Introduction
 
 该工具包是基于`mtouch.js`的上层封装，比较具有针对性，类似于一些需要手势操作型的项目，一键绑定事件，同时也基于`mcanvas.js`一键合成图片，内部封装复杂的各种逻辑和计算，尽量让业务方关注更少的东西。
 
 ## Change Log
+
+- 1.1.3(8.11)
+    -   `exportImage`增加 `cropOps`的参数，可以直接导出裁剪后的图片；
+    -   修改`exportImage`内部裁剪机制，提高速度；
+    -   增加`add`的 `use`参数可以传入 `all`，代表开启所有手势；
 
 - 1.1.2(8.9)
     - 修改 demo ，增加裁剪框功能演示；
@@ -207,6 +212,7 @@ ops:{
 	},
 
 	// 以下配置与初始化Init时参数一致，手势元素上的配置优先级高于手势盒子；
+    // 可使用 **use : 'all'** ， 代表开启所有手势；
 	use:{
 	    drag:false,
 	    pinch:false,
@@ -219,13 +225,22 @@ ops:{
 };
 ```
 
-### 3、`tk.exportImage(fn)`
+### 3、`tk.exportImage(fn，cropOps)`
 
 一键导出合成图，包含手势盒子中的背景和所有手势元素；
 
 params:
 
-	fn : function , 导出图片后的回调函数, 接受base64格式的结果图；
+    // 导出图片后的回调函数, 接受base64格式的结果图；
+	fn : function
+
+    // 裁剪参数，直接进行裁剪；
+    cropOps: {
+        x:0,
+        y:0,
+        width:'100%',   // 支持3种形式： width:100 / '100px' / '100%'
+        height:'100%'
+    };
 
 ### 4、`tk.switch(el)`
 

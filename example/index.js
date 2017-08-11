@@ -24,7 +24,7 @@ Tk.background({
     image:'./images/p3.jpg',
     type:'contain',
     // top:150,
-    static:true,
+    // static:true,
 }).add({
     image:`images/ear.png`,
     width:'100px',
@@ -32,7 +32,7 @@ Tk.background({
         drag:true,
         pinch:true,
         rotate:true,
-        singlePinch:false,
+        singlePinch:true,
         singleRotate:true,
     },
     limit:true,
@@ -65,6 +65,11 @@ $('.js-export').on('click',function(){
     Tk.exportImage(b64=>{
         $('.js-result').show();
         $('.js-result img').attr('src',b64);
+    },{
+        x:300,
+        y:300,
+        width:300,
+        height:300,
     });
 });
 $('.js-result').on('click',function(){
