@@ -5,6 +5,7 @@ import ZIndex from './zIndex';
 import _ from './utils';
 
 const EVENT = ['touchstart','touchmove','touchend','drag','dragstart','dragend','pinch','pinchstart','pinchend','rotate','rotatestart','rotatend','singlePinchstart','singlePinch','singlePinchend','singleRotate','singleRotatestart','singleRotatend'];
+const noop = function () {};
 
 window.requestAnimFrame = (function() {
     return window.requestAnimationFrame || window.webkitRequestAnimationFrame || function(callback) {
@@ -28,15 +29,10 @@ export default function Touchkit(ops) {
         },
         limit:false,
         // event
-        event:{
-            touchstart() {},touchmove() {},touchend() {},
-            dragstart() {},drag(){},dragend() {},
-            pinchstart() {},pinch(){},pinchend() {},
-            rotatestart() {},rotate(){},rotatend() {},
-            singlePinchstart(){},singlePinch(){},singlePinchend(){},
-            singleRotatestart(){},singleRotate(){},singleRotatend(){},
-        },
+        event: {},
     };
+
+    EVENT.map(eventName => this._ops.event[eventName] = noop);
 
     if(typeof ops == 'object'){
         this._ops = _.extend(this._ops, ops);
