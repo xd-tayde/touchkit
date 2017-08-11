@@ -24,6 +24,7 @@ Tk.background({
     image:'./images/p3.jpg',
     type:'contain',
     // top:150,
+    static:true,
 }).add({
     image:`images/ear.png`,
     width:'100px',
@@ -31,7 +32,7 @@ Tk.background({
         drag:true,
         pinch:true,
         rotate:true,
-        singlePinch:true,
+        singlePinch:false,
         singleRotate:true,
     },
     limit:true,
@@ -45,13 +46,7 @@ Tk.background({
 }).add({
     image:`images/neck.png`,
     width:100,
-    use:{
-        drag:true,
-        pinch:true,
-        rotate:true,
-        singlePinch:true,
-        singleRotate:true,
-    },
+    use:'all',
     limit:true,
     pos:{
         x:0,

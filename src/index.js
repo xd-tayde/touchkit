@@ -205,6 +205,15 @@ Touchkit.prototype.add = function(ops){
 
     ops.forEach(v=>{
         _.getImage(v.image,img=>{
+            if(v.use == 'all'){
+                v.use ={
+                    drag:true,
+                    pinch:true,
+                    rotate:true,
+                    singlePinch:true,
+                    singleRotate:true,
+                };
+            }
             this._add(img,_.extend(_ops,v));
         });
     });
@@ -282,7 +291,7 @@ Touchkit.prototype.cropBox = function(){
     };
 };
 // 使用 mcanvas 合成图片后导出 base64;
-Touchkit.prototype.exportImage = function(cbk){
+Touchkit.prototype.exportImage = function(cbk,cropOps){
     let cwidth = this.elStatus.width,
         cheight = this.elStatus.height;
     let bg = this._childs.background;
@@ -314,20 +323,21 @@ Touchkit.prototype.exportImage = function(cbk){
             let cropBoxOps = this._childs.cropBox;
             let cropBox = cropBoxOps.el;
             let cropBoxPos = _.getPos(cropBox);
-            _.getImage(b64,img=>{
-                let cMc = new MC(cropBoxOps.ops.width * ratio,cropBoxOps.ops.height * ratio);
-                cMc.add(img,{
-                    width:img.naturalWidth,
-                    pos:{
-                        x: -cropBoxPos.x * ratio,
-                        y: -cropBoxPos.y * ratio,
-                        scale:1,
-                        rotate:0,
-                    },
-                }).draw(base64=>{
-                    cbk(base64);
-                });
+            let cMc = new MC(cropBoxOps.ops.width * ratio,cropBoxOps.ops.height * ratio);
+            cMc.add(mc.canvas,{
+                width:mc.canvas.width,
+                pos:{
+                    x: -cropBoxPos.x * ratio,
+                    y: -cropBoxPos.y * ratio,
+                    scale:1,
+                    rotate:0,
+                },
+            }).draw(base64=>{
+                cbk(base64);
             });
+            // _.getImage(b64,img=>{
+            //
+            // });
         }else{
             cbk(b64);
         }

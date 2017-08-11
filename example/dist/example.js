@@ -1705,6 +1705,15 @@ Touchkit.prototype.add = function (ops) {
 
     ops.forEach(function (v) {
         _$2.getImage(v.image, function (img) {
+            if (v.use == 'all') {
+                v.use = {
+                    drag: true,
+                    pinch: true,
+                    rotate: true,
+                    singlePinch: true,
+                    singleRotate: true
+                };
+            }
             _this2._add(img, _$2.extend(_ops, v));
         });
     });
@@ -1782,7 +1791,7 @@ Touchkit.prototype.cropBox = function () {
     };
 };
 // 使用 mcanvas 合成图片后导出 base64;
-Touchkit.prototype.exportImage = function (cbk) {
+Touchkit.prototype.exportImage = function (cbk, cropOps) {
     var _this3 = this;
 
     var cwidth = this.elStatus.width,
@@ -1816,20 +1825,21 @@ Touchkit.prototype.exportImage = function (cbk) {
             var cropBoxOps = _this3._childs.cropBox;
             var cropBox = cropBoxOps.el;
             var cropBoxPos = _$2.getPos(cropBox);
-            _$2.getImage(b64, function (img) {
-                var cMc = new MCanvas(cropBoxOps.ops.width * ratio, cropBoxOps.ops.height * ratio);
-                cMc.add(img, {
-                    width: img.naturalWidth,
-                    pos: {
-                        x: -cropBoxPos.x * ratio,
-                        y: -cropBoxPos.y * ratio,
-                        scale: 1,
-                        rotate: 0
-                    }
-                }).draw(function (base64) {
-                    cbk(base64);
-                });
+            var cMc = new MCanvas(cropBoxOps.ops.width * ratio, cropBoxOps.ops.height * ratio);
+            cMc.add(mc.canvas, {
+                width: mc.canvas.width,
+                pos: {
+                    x: -cropBoxPos.x * ratio,
+                    y: -cropBoxPos.y * ratio,
+                    scale: 1,
+                    rotate: 0
+                }
+            }).draw(function (base64) {
+                cbk(base64);
             });
+            // _.getImage(b64,img=>{
+            //
+            // });
         } else {
             cbk(b64);
         }
@@ -2196,8 +2206,9 @@ var Tk = new Touchkit({
 });
 Tk.background({
     image: './images/p3.jpg',
-    type: 'contain'
+    type: 'contain',
     // top:150,
+    static: true
 }).add({
     image: 'images/ear.png',
     width: '100px',
@@ -2205,7 +2216,7 @@ Tk.background({
         drag: true,
         pinch: true,
         rotate: true,
-        singlePinch: true,
+        singlePinch: false,
         singleRotate: true
     },
     limit: true,
@@ -2219,13 +2230,7 @@ Tk.background({
 }).add({
     image: 'images/neck.png',
     width: 100,
-    use: {
-        drag: true,
-        pinch: true,
-        rotate: true,
-        singlePinch: true,
-        singleRotate: true
-    },
+    use: 'all',
     limit: true,
     pos: {
         x: 0,
