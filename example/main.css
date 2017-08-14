@@ -72,30 +72,32 @@ html,body{
     text-align: center;
 }
 .export{
-    width: 130px;
-    height: 40px;
+    width: 120px;
+    height: 35px;
     background: #996699;
     position: fixed;
     color: white;
-    line-height: 40px;
+    line-height: 35px;
     text-align: center;
     border-radius: 25px;
     left: 75%;
     margin-left: -75px;
     bottom:20px;
+    font-size: 16px;
 }
 .addCropBox{
-    width: 130px;
-    height: 40px;
+    width: 120px;
+    height: 35px;
     background: #996699;
     position: fixed;
     color: white;
-    line-height: 40px;
+    line-height: 35px;
     text-align: center;
     border-radius: 25px;
     left: 35%;
     margin-left: -75px;
     bottom:20px;
+    font-size: 16px;
 }
 .Button.taped{
     background: #CC99CC;
@@ -212,6 +214,7 @@ html,body{
     color: #996699;
     width: 80%;
     text-align: left;
+    font-size: 14px;
 }
 .mask{
     width: 100%;

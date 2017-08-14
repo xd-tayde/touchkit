@@ -636,8 +636,16 @@ MCanvas.prototype._init = function () {
 MCanvas.prototype.background = function (bg) {
     var _this = this;
 
-    if (!bg && this.bgConfig) bg = this.bgConfig;
-    this.bgConfig = bg;
+    if (!bg) {
+        if (this.bgConfig) {
+            bg = this.bgConfig;
+        } else {
+            console.error('mcanvas error : the init background must has the bg option params.');
+            return;
+        }
+    } else {
+        this.bgConfig = bg;
+    }
     this.queue.push(function () {
         if (bg.color) {
             _this.ctx.fillStyle = bg.color;
@@ -648,7 +656,7 @@ MCanvas.prototype.background = function (bg) {
                 _this._background(img, bg);
             });
         } else {
-            console.error('background image error!');
+            console.error('mcanvas error : background image error!');
         }
     });
     return this;
@@ -718,7 +726,7 @@ MCanvas.prototype._background = function (img, bg) {
             dheight = this.canvas.height;
             break;
         default:
-            console.error('background type error!');
+            console.error('mcanvas error:background type error!');
     }
     this.ctx.drawImage(img, sx, sy, swidth, sheight, dx, dy, dwidth, dheight);
     this._next();
@@ -733,7 +741,7 @@ MCanvas.prototype.watermark = function () {
     var ops = arguments[1];
 
     if (!image) {
-        console.log('there is not image of watermark');
+        console.error('mcanvas error : there is not image of watermark.');
         return;
     }
     // 参数默认值；
@@ -845,7 +853,9 @@ MCanvas.prototype._add = function (img, ops) {
     var lctx = lcvs.getContext('2d');
     // 图片宽高比 * 1.4 是一个最安全的宽度，旋转任意角度都不会被裁剪；
     // 没有旋转却长宽比很高大的图，会导致放大倍数太大，因此甚至了最高倍数为5；
-    var lctxScale = ratio * 1.4 > 5 ? 5 : ratio * 1.4;
+    // _ratio 为 较大边 / 较小编 的比例；
+    var _ratio = iw > ih ? iw / ih : ih / iw;
+    var lctxScale = _ratio * 1.4 > 5 ? 5 : _ratio * 1.4;
     var spaceX = void 0,
         spaceY = void 0;
 
@@ -860,7 +870,6 @@ MCanvas.prototype._add = function (img, ops) {
 
     lctx.translate(lcvs.width / 2, lcvs.height / 2);
     lctx.rotate(ops.pos.rotate);
-
     lctx.drawImage(img, lsx, lsy, lsw, lsh, ldx, ldy, ldw, ldh);
     //
     // lcvs.style = 'width:300px';
@@ -2276,13 +2285,7 @@ Tk.background({
 }).add({
     image: 'images/ear.png',
     width: '100px',
-    use: {
-        drag: true,
-        pinch: true,
-        rotate: true,
-        singlePinch: true,
-        singleRotate: true
-    },
+    use: 'all',
     limit: true,
     pos: {
         x: 116,
@@ -2313,11 +2316,6 @@ $('.js-export').on('click', function () {
     Tk.exportImage(function (b64) {
         $('.js-result').show();
         $('.js-result img').attr('src', b64);
-    }, {
-        x: 300,
-        y: 300,
-        width: 300,
-        height: 300
     });
 });
 $('.js-result').on('click', function () {

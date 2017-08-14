@@ -28,13 +28,7 @@ Tk.background({
 }).add({
     image:`images/ear.png`,
     width:'100px',
-    use:{
-        drag:true,
-        pinch:true,
-        rotate:true,
-        singlePinch:true,
-        singleRotate:true,
-    },
+    use:'all',
     limit:true,
     pos:{
         x:116,
@@ -65,11 +59,6 @@ $('.js-export').on('click',function(){
     Tk.exportImage(b64=>{
         $('.js-result').show();
         $('.js-result img').attr('src',b64);
-    },{
-        x:300,
-        y:300,
-        width:300,
-        height:300,
     });
 });
 $('.js-result').on('click',function(){
