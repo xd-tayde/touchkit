@@ -107,7 +107,7 @@ ops:{
 	    scale:1,
 	    rotate:0,
 	},
-	
+
 	// the use switch of single element;
 	// use:'all' : open all gesture;
 	use:{
@@ -117,10 +117,10 @@ ops:{
 	    singlePinch:false,
 	    singleRotate:false,
 	},
-	
+
 	// limit params;
 	limit:object || boolean,
-	
+
 	// add close btn on touch element;
 	close:boolean,
 };
@@ -128,7 +128,7 @@ ops:{
 
 ### 3、`tk.exportImage(fn，cropOps)`
 
-export a composite image that is what you see in touch box. 
+export a composite image that is what you see in touch box.
 
 params:
 
@@ -139,9 +139,9 @@ params:
     cropOps: {
         x:0,
         y:0,
-        
+
         // example : width:100 / '100px' / '100%'
-        width:'100%', 
+        width:'100%',
         height:'100%'
     };
 
@@ -172,3 +172,7 @@ destory the touch-box , unbind all gesture event , but maintain all element's st
 ### 8、`tk.cropBox()`
 
 add a corp box that can operate to crop the image.
+
+### 9、`tk.clear()`
+
+remove all touch-element except the background-image and cropBox;

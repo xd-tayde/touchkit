@@ -1580,6 +1580,8 @@ function Touchkit(ops) {
 }
 
 Touchkit.prototype._init = function () {
+    var childs = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
     // 操作元素
     this.operator = null;
     this.operatorStatus = null;
@@ -1587,7 +1589,7 @@ Touchkit.prototype._init = function () {
     this.transform = null;
     this.freezed = false;
     // 子元素仓库，index用于标记子元素；
-    this._childs = {};
+    this._childs = childs;
     this._childIndex = 0;
     this._activeChild = null;
     // 管理子元素之间的zindex层级关系；
@@ -1696,7 +1698,8 @@ Touchkit.prototype.background = function (ops) {
 
         _this2._childs.background = {
             el: img,
-            ops: _ops
+            ops: _ops,
+            type: 'background'
         };
     });
     return this;
@@ -1771,7 +1774,8 @@ Touchkit.prototype._add = function (img, ops) {
     // 记录数据；
     this._childs[this._childIndex] = {
         el: _ele,
-        ops: ops
+        ops: ops,
+        type: 'element'
     };
     // 根据id进行zIndex的设置；
     this._zIndexBox.setIndex('mt-child-' + this._childIndex);
@@ -1797,6 +1801,7 @@ Touchkit.prototype.cropBox = function () {
     this._cropBox = true;
     this._childs['cropBox'] = {
         el: cropBox,
+        type: 'cropBox',
         ops: {
             width: cropBox.offsetWidth,
             height: cropBox.offsetHeight,
@@ -1822,17 +1827,24 @@ Touchkit.prototype.exportImage = function (cbk, cropOps) {
 
     var cwidth = this.elStatus.width,
         cheight = this.elStatus.height;
-    var bg = this._childs.background;
-    var ratio = bg.ops.ratio;
-    var bgPos = _$2.xRatio(_$2.getPos(bg.el), ratio);
+    var ratio = 1;
+    var addChilds = [];
+
+    if (this._childs.background) {
+        var bg = this._childs.background;
+        ratio = bg.ops.ratio;
+        var bgPos = _$2.xRatio(_$2.getPos(bg.el), ratio);
+        addChilds.push({
+            image: bg.el,
+            options: {
+                width: bg.el.width * ratio,
+                pos: bgPos
+            }
+        });
+    }
+
     var mc = new MCanvas(cwidth * ratio, cheight * ratio, '#ffffff');
-    var addChilds = [{
-        image: bg.el,
-        options: {
-            width: bg.el.width * ratio,
-            pos: bgPos
-        }
-    }];
+
     this._zIndexBox.zIndexArr.forEach(function (v) {
         var child = document.querySelector('#' + v);
         var image = child.querySelector('.mt-image');
@@ -2114,7 +2126,9 @@ Touchkit.prototype.switch = function (el, addButton) {
         el = _$2.getEl(el);
     }
     _$2.forin(this._childs, function (k, v) {
-        _$2.removeClass(v.el, 'mt-active');
+        if (v) {
+            _$2.removeClass(v.el, 'mt-active');
+        }
     });
     // 转换操作元素后，也需要重置 mtouch 中的单指缩放基本点 singleBasePoint;
     this.mt.switch(el, addButton);
@@ -2131,7 +2145,9 @@ Touchkit.prototype.switch = function (el, addButton) {
 Touchkit.prototype._getOperatorOps = function (target) {
     var _tar = target || this.operator;
     var index = _$2.data(_tar, 'mt-index');
-    return this._childs[index].ops;
+    if (this._childs[index]) {
+        return this._childs[index].ops;
+    }
 };
 
 // 冻结手势容器，暂停所有操作，且失去焦点；
@@ -2139,7 +2155,9 @@ Touchkit.prototype._getOperatorOps = function (target) {
 Touchkit.prototype.freeze = function (boolean) {
     if (boolean) {
         _$2.forin(this._childs, function (k, v) {
-            _$2.removeClass(v.el, 'mt-active');
+            if (v) {
+                _$2.removeClass(v.el, 'mt-active');
+            }
         });
     } else {
         _$2.addClass(this._activeChild, 'mt-active');
@@ -2148,10 +2166,25 @@ Touchkit.prototype.freeze = function (boolean) {
     return this;
 };
 
+Touchkit.prototype.clear = function () {
+    var _this6 = this;
+
+    _$2.forin(this._childs, function (k, v) {
+        if (v && v.type == 'element') {
+            _$2.remove(v.el);
+            _this6._childs[k] = null;
+        }
+    });
+    this._init(this._childs);
+    console.log(this);
+};
+
 // 重置所有状态到初始化阶段；
 Touchkit.prototype.reset = function () {
     _$2.forin(this._childs, function (k, v) {
-        _$2.remove(v.el);
+        if (v) {
+            _$2.remove(v.el);
+        }
     });
     this._init();
 };
@@ -2159,7 +2192,9 @@ Touchkit.prototype.reset = function () {
 // 销毁，但保持原有样式，失去焦点与事件绑定；
 Touchkit.prototype.destory = function () {
     _$2.forin(this._childs, function (k, v) {
-        _$2.removeClass(v.el, 'mt-active');
+        if (v) {
+            _$2.removeClass(v.el, 'mt-active');
+        }
     });
     this.mt && this.mt.destroy();
     this.mt = null;

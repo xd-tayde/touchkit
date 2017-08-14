@@ -53,6 +53,7 @@ Tk.background({
 
 $('.js-cropBox').on('click',function(){
     Tk.cropBox();
+    // Tk.clear();
 });
 
 $('.js-export').on('click',function(){
