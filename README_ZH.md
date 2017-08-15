@@ -98,7 +98,7 @@ new Touchkit('.js-par')
 // 一键导出合成图；
 // export a image contain all elements what you see in touch box
 .exportImage(b64=>{
-	console.log(b64);
+   console.log(b64);
 })
 ```
 
