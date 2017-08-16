@@ -12,6 +12,11 @@
 
 ## Change Log
 
+- 1.1.7(8.16)
+    - 由于异步的缘故，增加 `background/add` 接口可以传入 `success/error` 回调；
+        - success : 会在添加成功后调用，传入 `tk` 实例；
+        - error ： 会在添加失败后的调用，例如无网络图片加载失败；
+
 - 1.1.6(8.15)
     - 增加新api `tk.getChild(index)` 获取对应的手势元素配置；
 
@@ -191,6 +196,11 @@ bg : {
     // the offset from the upper left point of touch box
     left:0,
     top:0,
+
+    // 成功回调，传入tk实例
+    success(){},
+    // 失败回调；
+    error(){},
 };
 ```
 
@@ -228,8 +238,16 @@ ops:{
 	    singlePinch:false,
 	    singleRotate:false,
 	},
+    // 单元素限制参数；
 	limit:object || boolean,
+
+    // 单元素关闭按钮；
 	close:boolean,
+    
+    // 成功回调，传入tk实例
+    success(){},
+    // 失败回调；
+    error(){},
 };
 ```
 

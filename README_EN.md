@@ -82,6 +82,11 @@ bg : {
     // the offset from the upper left point of touch box
     left:0,
     top:0,
+
+	// success callback;
+    success(){},
+    // error callback;
+    error(){},
 };
 ```
 
@@ -123,6 +128,11 @@ ops:{
 
 	// add close btn on touch element;
 	close:boolean,
+
+	// success callback;
+    success(){},
+    // error callback;
+    error(){},
 };
 ```
 

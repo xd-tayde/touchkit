@@ -1429,17 +1429,19 @@ var _$2 = {
         };
         img.src = image;
     },
-    getImage: function getImage(image, cbk) {
+    getImage: function getImage(image, success, error) {
         if (typeof image == 'string') {
             this.loadImage(image, function (img) {
-                cbk(img);
+                success(img);
             }, function (err) {
                 console.log(err);
+                error(err);
             });
         } else if ((typeof image === 'undefined' ? 'undefined' : _typeof$3(image)) == 'object' && image instanceof Node) {
-            cbk(image);
+            success(image);
         } else {
             console.log('add image error');
+            error('type of image is error!');
             return;
         }
     },
@@ -1617,7 +1619,9 @@ Touchkit.prototype.background = function (ops) {
         top: 0,
         // 在type=crop时使用，背景图只需启动拖动操作；
         use: {},
-        static: false
+        static: false,
+        success: function success() {},
+        error: function error() {}
     };
     _ops = _$2.extend(_ops, ops);
     _$2.getImage(_ops.image, function (img) {
@@ -1707,6 +1711,9 @@ Touchkit.prototype.background = function (ops) {
             ops: _ops,
             type: 'background'
         };
+        _ops.success(_this2);
+    }, function (err) {
+        _ops.error(err);
     });
     return this;
 };
@@ -1731,7 +1738,9 @@ Touchkit.prototype.add = function (ops) {
             scale: 1,
             rotate: 0
         },
-        close: false
+        close: false,
+        success: function success() {},
+        error: function error() {}
     };
 
     if (!_$2.isArr(ops)) ops = [ops];
@@ -1748,6 +1757,8 @@ Touchkit.prototype.add = function (ops) {
                 };
             }
             _this3._add(img, _$2.extend(_ops, v));
+        }, function (err) {
+            _ops.error(err);
         });
     });
     return this;
@@ -1798,7 +1809,11 @@ Touchkit.prototype._add = function (img, ops) {
         scale: ops.pos.scale,
         rotate: ops.pos.rotate
     });
+    _$2.setStyle(_ele, {
+        visibility: 'visible'
+    });
     this._childIndex++;
+    ops.success(this);
 };
 Touchkit.prototype.cropBox = function () {
     var cropBox = _$2.domify('<div class="mt-crop-box" data-mt-index="cropBox"><div class="mt-close-btn"></div></div>')[0];
@@ -2283,7 +2298,7 @@ Touchkit.prototype._insertCss = function () {
     _$2.addCssRule('.mtouch-singleButton', 'display: none;');
     _$2.addCssRule('.mt-child.mt-active', 'z-index: 99;outline:2px solid hsla(0,0%,100%,.5);');
     _$2.addCssRule('.mt-active .mtouch-singleButton,.mt-active .mt-close-btn', 'display: inline-block;');
-    _$2.addCssRule('.mt-child', 'position:absolute;text-align:left;');
+    _$2.addCssRule('.mt-child', 'position:absolute;text-align:left;visibility:hidden;');
     _$2.addCssRule('.mt-image', 'width:100%;height:100%;position:absolute;text-align:left;');
     _$2.addCssRule('.mt-close-btn', 'position:absolute;width:30px;height:30px;top:-15px;right:-15px;background-size:100%;display:none;background-image:url(' + base64$1 + ')');
     _$2.addCssRule('.mt-background', 'position:absolute;left:0;top:0;');

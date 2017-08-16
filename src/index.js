@@ -90,6 +90,8 @@ Touchkit.prototype.background = function(ops){
         // 在type=crop时使用，背景图只需启动拖动操作；
         use:{},
         static:false,
+        success(){},
+        error(){},
     };
     _ops = _.extend(_ops,ops);
     _.getImage(_ops.image, img => {
@@ -172,6 +174,9 @@ Touchkit.prototype.background = function(ops){
             ops: _ops,
             type:'background',
         };
+        _ops.success(this);
+    },(err)=>{
+        _ops.error(err);
     });
     return this;
 };
@@ -195,6 +200,8 @@ Touchkit.prototype.add = function(ops){
             rotate:0,
         },
         close:false,
+        success(){},
+        error(){},
     };
 
     if(!_.isArr(ops))ops = [ops];
@@ -211,6 +218,8 @@ Touchkit.prototype.add = function(ops){
                 };
             }
             this._add(img,_.extend(_ops,v));
+        },err=>{
+            _ops.error(err);
         });
     });
     return this;
@@ -258,7 +267,11 @@ Touchkit.prototype._add = function(img,ops){
         scale:ops.pos.scale,
         rotate:ops.pos.rotate,
     });
+    _.setStyle(_ele,{
+        visibility:'visible',
+    });
     this._childIndex++;
+    ops.success(this);
 };
 Touchkit.prototype.cropBox = function(){
     let cropBox = _.domify(`<div class="mt-crop-box" data-mt-index="cropBox"><div class="mt-close-btn"></div></div>`)[0];
@@ -730,7 +743,7 @@ Touchkit.prototype._insertCss = function(){
     _.addCssRule('.mtouch-singleButton','display: none;');
     _.addCssRule('.mt-child.mt-active','z-index: 99;outline:2px solid hsla(0,0%,100%,.5);');
     _.addCssRule('.mt-active .mtouch-singleButton,.mt-active .mt-close-btn','display: inline-block;');
-    _.addCssRule('.mt-child','position:absolute;text-align:left;');
+    _.addCssRule('.mt-child','position:absolute;text-align:left;visibility:hidden;');
     _.addCssRule('.mt-image','width:100%;height:100%;position:absolute;text-align:left;');
     _.addCssRule('.mt-close-btn',`position:absolute;width:30px;height:30px;top:-15px;right:-15px;background-size:100%;display:none;background-image:url(${removeBtn})`);
     _.addCssRule('.mt-background','position:absolute;left:0;top:0;');

@@ -208,17 +208,19 @@ export default {
         };
         img.src = image;
     },
-    getImage(image,cbk){
+    getImage(image,success,error){
         if(typeof image == 'string'){
             this.loadImage(image, img => {
-                cbk(img);
+                success(img);
             },err=>{
                 console.log(err);
+                error(err);
             });
         }else if(typeof image == 'object' && image instanceof Node){
-            cbk(image);
+            success(image);
         }else{
             console.log('add image error');
+            error('type of image is error!');
             return;
         }
     },

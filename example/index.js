@@ -25,6 +25,7 @@ Tk.background({
     type:'contain',
     // top:150,
     // static:true,
+    success(){},
 }).add({
     image:`images/ear.png`,
     width:'100px',
@@ -37,6 +38,7 @@ Tk.background({
         rotate:2.63,
     },
     close:true,
+    success(){},
 }).add({
     image:`images/neck.png`,
     width:100,
@@ -49,6 +51,7 @@ Tk.background({
         rotate:0,
     },
     close:true,
+    success(){},
 });
 
 $('.js-cropBox').on('click',function(){

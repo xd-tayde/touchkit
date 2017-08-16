@@ -514,6 +514,9 @@ MTouch.prototype._css = function () {
     _.addCssRule('.mtouch-singleButton', 'position:absolute;right:-15px;bottom: -15px;width:30px;height: 30px;background-size: 100% 100%;background-image:url(' + base64 + ');');
 };
 
+
+//# sourceMappingURL=mtouch.es.js.map
+
 var _typeof2$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _typeof$2 = typeof Symbol === "function" && _typeof2$1(Symbol.iterator) === "symbol" ? function (obj) {
@@ -1205,6 +1208,9 @@ MCanvas.prototype._next = function () {
     }
 };
 
+
+//# sourceMappingURL=mcanvas.es.js.map
+
 var base64$1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAABEBJREFUeNrsm01IVFEUx9+MpVMzgVrhLoqshdWMTq1GXbQpo1Vf0GChs6gk+sCFzUYwZMQaUTEQwYIQQ4Q+pEUfth5caCaYtCjLaJVkmajTSMh0DnMHJJ/v49x3573ROfAHec579/zmzpyPe+/Y4vG4tJHMLm0wywBngNeZbZK7WFZWtm4AI5GIOrCBtgPkAx0GFYJ2gbaDtrL/R0E/Qd9Ak6BR0BBoJqUzzGl5oHOgUyA3yKbw2mxQLmgv6CjoEgjz5DhoAPQYNGtV4AJQDejiihmkGL5BHqYgqB90DzRtlaCFb9pV/LqArnDC/m9bQAH2bBxjs9nAe0AvQfUgp8BY4GRj4Fj7zQI+DnoNOpjCoHsA9AJUkWrgC6AHoG0mZBqc7fvMh5QAV4HCoCwT02sW86FKNPAxUMhCdUWI+SQEeB+o0+SZlZvpTuabocCYDroER2Ke73SX1pSlFRgroCILl8xFzEdDgLGCqk2DPqGW+coNfMOiH2W5j/ZNXuB8kD+NusHzzGcy8BmQQ++ogUDANTg4WNDc3JzncDhsWu/D14bD4Ty8t7q62kUAdjCfuYB1W2VlpcvpdNrLy8sdLS0tmqDxNa2trfk+n8+B9/r9fhdxlk9TgbF5P0QZcXh4eCn5d0lJSY4adBLW4/FkJ6+NjIzEiMBupeClBFyq0ryvaY2Njb/HxsY0QcvBjo6OLoVCoTmOfrqUAuylRo5YLBavq6ubVYNeCzYYDM7iMziCl4cCXMgTLtWgBcJKbMlIfvrltlrYqiUupu3mzRMIhpAIm7yGb4LdbrcJgkX7KiUWD1etWqoFLW5ba6YFwir6rgTsMmhwWWiBsIq+p3TnAT/GMtdEDPWXArxg1OhyAUpPnibYAgV4xijYtra2VdFYa54m2hwFeMooWLfbvSpAacnTHPaFAjwpChYDlNbihGifKcDvRMHqrcgINk4BxsKDlCqamppy1WDVoBsaGnKJsDhGhAL8A/SeMmJxcXGOnjwrB+31enOIwOjzNDUPP6WM2NvbuxCNRuNQ1sW0FhVJaLwH7+3r65snAg8otlIKtXRyiectZdXDJMMe+gjoV/KCnlpaYjf2p9GaVv9KWGpp2QFaTAPYRearxAuMAaA9DYDbJQ2nBLRW7rg9OWFh2Anmo2QUMHYfeJxh3oKw2CjUKHVI1PYQa+vroGULwaIv15RqZ95++I2UOGthFatnPkmigNF6QLdMnull5kOP7kUI4oCPpMT2pBnfaUw/l5kPUqqA0fAET0WKo/cH0EnQK/IyE6cDU8yBO6ysE1ky3gWdAH3keZARK2iYDvBoIK4Dd0uJA6NG2R/QQymxddKhNfUomZFnLb+DbjP4s1JiFw834/Q28nHW4j0DPVGrjc0EXtlwdDPtZDOP+1R40kbp+PAntsoyxHpxISb6vDQ6/pzJErbhfgJgy/xuKQOcAU5r+yfAAGDyyaocNx08AAAAAElFTkSuQmCC";
 
 var _typeof$3 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -1423,17 +1429,19 @@ var _$2 = {
         };
         img.src = image;
     },
-    getImage: function getImage(image, cbk) {
+    getImage: function getImage(image, success, error) {
         if (typeof image == 'string') {
             this.loadImage(image, function (img) {
-                cbk(img);
+                success(img);
             }, function (err) {
                 console.log(err);
+                error(err);
             });
         } else if ((typeof image === 'undefined' ? 'undefined' : _typeof$3(image)) == 'object' && image instanceof Node) {
-            cbk(image);
+            success(image);
         } else {
             console.log('add image error');
+            error('type of image is error!');
             return;
         }
     },
@@ -1611,7 +1619,9 @@ Touchkit.prototype.background = function (ops) {
         top: 0,
         // 在type=crop时使用，背景图只需启动拖动操作；
         use: {},
-        static: false
+        static: false,
+        success: function success() {},
+        error: function error() {}
     };
     _ops = _$2.extend(_ops, ops);
     _$2.getImage(_ops.image, function (img) {
@@ -1701,6 +1711,9 @@ Touchkit.prototype.background = function (ops) {
             ops: _ops,
             type: 'background'
         };
+        _ops.success(_this2);
+    }, function (err) {
+        _ops.error(err);
     });
     return this;
 };
@@ -1725,7 +1738,9 @@ Touchkit.prototype.add = function (ops) {
             scale: 1,
             rotate: 0
         },
-        close: false
+        close: false,
+        success: function success() {},
+        error: function error() {}
     };
 
     if (!_$2.isArr(ops)) ops = [ops];
@@ -1742,6 +1757,8 @@ Touchkit.prototype.add = function (ops) {
                 };
             }
             _this3._add(img, _$2.extend(_ops, v));
+        }, function (err) {
+            _ops.error(err);
         });
     });
     return this;
@@ -1792,7 +1809,11 @@ Touchkit.prototype._add = function (img, ops) {
         scale: ops.pos.scale,
         rotate: ops.pos.rotate
     });
+    _$2.setStyle(_ele, {
+        visibility: 'visible'
+    });
     this._childIndex++;
+    ops.success(this);
 };
 Touchkit.prototype.cropBox = function () {
     var cropBox = _$2.domify('<div class="mt-crop-box" data-mt-index="cropBox"><div class="mt-close-btn"></div></div>')[0];
@@ -2277,7 +2298,7 @@ Touchkit.prototype._insertCss = function () {
     _$2.addCssRule('.mtouch-singleButton', 'display: none;');
     _$2.addCssRule('.mt-child.mt-active', 'z-index: 99;outline:2px solid hsla(0,0%,100%,.5);');
     _$2.addCssRule('.mt-active .mtouch-singleButton,.mt-active .mt-close-btn', 'display: inline-block;');
-    _$2.addCssRule('.mt-child', 'position:absolute;text-align:left;');
+    _$2.addCssRule('.mt-child', 'position:absolute;text-align:left;visibility:hidden;');
     _$2.addCssRule('.mt-image', 'width:100%;height:100%;position:absolute;text-align:left;');
     _$2.addCssRule('.mt-close-btn', 'position:absolute;width:30px;height:30px;top:-15px;right:-15px;background-size:100%;display:none;background-image:url(' + base64$1 + ')');
     _$2.addCssRule('.mt-background', 'position:absolute;left:0;top:0;');
@@ -2306,9 +2327,10 @@ var Tk = new Touchkit({
 });
 Tk.background({
     image: './images/p3.jpg',
-    type: 'contain'
+    type: 'contain',
     // top:150,
     // static:true,
+    success: function success() {}
 }).add({
     image: 'images/ear.png',
     width: '100px',
@@ -2320,7 +2342,8 @@ Tk.background({
         scale: 1.25,
         rotate: 2.63
     },
-    close: true
+    close: true,
+    success: function success() {}
 }).add({
     image: 'images/neck.png',
     width: 100,
@@ -2332,7 +2355,8 @@ Tk.background({
         scale: 1,
         rotate: 0
     },
-    close: true
+    close: true,
+    success: function success() {}
 });
 
 $('.js-cropBox').on('click', function () {
