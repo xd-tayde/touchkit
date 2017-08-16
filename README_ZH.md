@@ -12,6 +12,9 @@
 
 ## Change Log
 
+- 1.1.6(8.15)
+    - 增加新api `tk.getChild(index)` 获取对应的手势元素配置；
+
 - 1.1.5(8.14)
     - 完善英文版文档；
     - 增加 `clear` 方法，用于清除所有贴纸，不包括背景和裁剪框；
@@ -277,3 +280,11 @@ params:
 ### 9、`tk.clear()`
 
 删除所有贴纸；
+
+### 10、`tk.getChild(index)`
+
+获取手势元素；
+
+params：
+
+    index: 元素索引，为 `dom` 上的 `data-mt-index`的值;

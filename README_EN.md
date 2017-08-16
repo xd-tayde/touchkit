@@ -176,3 +176,10 @@ add a corp box that can operate to crop the image.
 ### 9、`tk.clear()`
 
 remove all touch-element except the background-image and cropBox;
+
+### 10、`tk.getChild(index)`
+
+get touch-element option;
+params：
+    index: the index of touch-element,
+		   the value of dom's `data-mt-index`;

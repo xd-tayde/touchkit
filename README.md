@@ -12,7 +12,7 @@ This toolkit is built on `mtouch.js` and `mcanvas.js`. Use it, you can build a g
 
 ## Basic Usage
 
-The idea of touchkit is that init create a touch box firstly, and then use `tk.add()` add the background and touch-element into the touch box, finally, export a composite image by `tk.exportImage()`. The image is what you see in touch box. 
+The idea of touchkit is that init create a touch box firstly, and then use `tk.add()` add the background and touch-element into the touch box, finally, export a composite image by `tk.exportImage()`. The image is what you see in touch box.
 
 the simple example, see the document for more details
 

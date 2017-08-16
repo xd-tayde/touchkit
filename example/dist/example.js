@@ -520,9 +520,6 @@ MTouch.prototype._css = function () {
     _.addCssRule('.mtouch-singleButton', 'position:absolute;right:-15px;bottom: -15px;width:30px;height: 30px;background-size: 100% 100%;background-image:url(' + base64 + ');');
 };
 
-
-//# sourceMappingURL=mtouch.es.js.map
-
 var _typeof2$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _typeof$2 = typeof Symbol === "function" && _typeof2$1(Symbol.iterator) === "symbol" ? function (obj) {
@@ -1213,9 +1210,6 @@ MCanvas.prototype._next = function () {
         this.end();
     }
 };
-
-
-//# sourceMappingURL=mcanvas.es.js.map
 
 var base64$1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAABEBJREFUeNrsm01IVFEUx9+MpVMzgVrhLoqshdWMTq1GXbQpo1Vf0GChs6gk+sCFzUYwZMQaUTEQwYIQQ4Q+pEUfth5caCaYtCjLaJVkmajTSMh0DnMHJJ/v49x3573ROfAHec579/zmzpyPe+/Y4vG4tJHMLm0wywBngNeZbZK7WFZWtm4AI5GIOrCBtgPkAx0GFYJ2gbaDtrL/R0E/Qd9Ak6BR0BBoJqUzzGl5oHOgUyA3yKbw2mxQLmgv6CjoEgjz5DhoAPQYNGtV4AJQDejiihmkGL5BHqYgqB90DzRtlaCFb9pV/LqArnDC/m9bQAH2bBxjs9nAe0AvQfUgp8BY4GRj4Fj7zQI+DnoNOpjCoHsA9AJUkWrgC6AHoG0mZBqc7fvMh5QAV4HCoCwT02sW86FKNPAxUMhCdUWI+SQEeB+o0+SZlZvpTuabocCYDroER2Ke73SX1pSlFRgroCILl8xFzEdDgLGCqk2DPqGW+coNfMOiH2W5j/ZNXuB8kD+NusHzzGcy8BmQQ++ogUDANTg4WNDc3JzncDhsWu/D14bD4Ty8t7q62kUAdjCfuYB1W2VlpcvpdNrLy8sdLS0tmqDxNa2trfk+n8+B9/r9fhdxlk9TgbF5P0QZcXh4eCn5d0lJSY4adBLW4/FkJ6+NjIzEiMBupeClBFyq0ryvaY2Njb/HxsY0QcvBjo6OLoVCoTmOfrqUAuylRo5YLBavq6ubVYNeCzYYDM7iMziCl4cCXMgTLtWgBcJKbMlIfvrltlrYqiUupu3mzRMIhpAIm7yGb4LdbrcJgkX7KiUWD1etWqoFLW5ba6YFwir6rgTsMmhwWWiBsIq+p3TnAT/GMtdEDPWXArxg1OhyAUpPnibYAgV4xijYtra2VdFYa54m2hwFeMooWLfbvSpAacnTHPaFAjwpChYDlNbihGifKcDvRMHqrcgINk4BxsKDlCqamppy1WDVoBsaGnKJsDhGhAL8A/SeMmJxcXGOnjwrB+31enOIwOjzNDUPP6WM2NvbuxCNRuNQ1sW0FhVJaLwH7+3r65snAg8otlIKtXRyiectZdXDJMMe+gjoV/KCnlpaYjf2p9GaVv9KWGpp2QFaTAPYRearxAuMAaA9DYDbJQ2nBLRW7rg9OWFh2Anmo2QUMHYfeJxh3oKw2CjUKHVI1PYQa+vroGULwaIv15RqZ95++I2UOGthFatnPkmigNF6QLdMnull5kOP7kUI4oCPpMT2pBnfaUw/l5kPUqqA0fAET0WKo/cH0EnQK/IyE6cDU8yBO6ysE1ky3gWdAH3keZARK2iYDvBoIK4Dd0uJA6NG2R/QQymxddKhNfUomZFnLb+DbjP4s1JiFw834/Q28nHW4j0DPVGrjc0EXtlwdDPtZDOP+1R40kbp+PAntsoyxHpxISb6vDQ6/pzJErbhfgJgy/xuKQOcAU5r+yfAAGDyyaocNx08AAAAAElFTkSuQmCC";
 
@@ -2252,6 +2246,10 @@ Touchkit.prototype._get = function (drection, str, par, child) {
         }
     }
     return result;
+};
+
+Touchkit.prototype.getChild = function (index) {
+    return this._childs[index] || null;
 };
 
 Touchkit.prototype._isAdd = function (el) {

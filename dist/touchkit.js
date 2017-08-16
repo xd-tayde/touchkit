@@ -2248,6 +2248,10 @@ Touchkit.prototype._get = function (drection, str, par, child) {
     return result;
 };
 
+Touchkit.prototype.getChild = function (index) {
+    return this._childs[index] || null;
+};
+
 Touchkit.prototype._isAdd = function (el) {
     var target = el;
     while (target !== this.el || target.tagName.toLowerCase() == 'body') {
