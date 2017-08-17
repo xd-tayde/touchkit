@@ -55,10 +55,8 @@ Tk.background({
 });
 
 $('.js-cropBox').on('click',function(){
-    // Tk.cropBox();
+    Tk.cropBox();
     // Tk.clear();
-    console.log(Tk.getChild('background'));
-    console.log(Tk._childs);
 });
 
 $('.js-export').on('click',function(){

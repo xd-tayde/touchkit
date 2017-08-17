@@ -1,6 +1,6 @@
 {
   "name": "touchkit",
-  "version": "1.1.9",
+  "version": "1.2.0",
   "description": "a touch kit based on mtouch,it make you create a gesture app more quickly and simply",
   "keywords": [
     "touch",
@@ -47,6 +47,6 @@
   },
   "dependencies": {
     "mcanvas": "^1.1.7",
-    "mtouch": "^3.0.6"
+    "mtouch": "^3.0.7"
   }
 }

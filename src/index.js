@@ -42,6 +42,8 @@ export default function Touchkit(ops) {
 
     // 手势容器；
     this.el = _.getEl(this._ops.el);
+
+    _.addClass(this.el,'mt-touch-box');
     // 容器宽高，优先使用clientWidth，避免边框等因素的影响；
     this.elStatus = {
         width:this.el.clientWidth || this.el.offsetWidth,
@@ -107,8 +109,11 @@ Touchkit.prototype.background = function(ops){
         let minX = 0 , minY = 0;
         let ratio;
 
+        let template = _.domify(`<div class="mt-background" data-mt-index="background" data-mt-bg-type=${_ops.type}><div class="mt-prevent"></div></div>`)[0];
+
         // 初始化背景图属性；
-        _.addClass(img,'mt-background').data(img,'mt-index','background').data(img,'mt-bg-type', _ops.type);
+        _.addClass(img,'mt-image');
+        template.appendChild(img);
 
         if(_ops.type == 'contain'){
             if(iratio > pratio){
@@ -157,7 +162,7 @@ Touchkit.prototype.background = function(ops){
                 };
             }
         }
-        _.setStyle(img,{
+        _.setStyle(template,{
             width:`${width}px`,
             height:`${height}px`,
             transform:`translate(${left}px,${top}px)`,
@@ -166,13 +171,13 @@ Touchkit.prototype.background = function(ops){
 
         _ops.pos = {width,height,left,top};
 
-        this.el.appendChild(img);
+        this.el.appendChild(template);
 
         // 记录背景图参数；
         _ops.ratio = ratio;
 
         this._childs.background = {
-            el:img,
+            el:template,
             ops: _ops,
             type:'background',
         };
@@ -231,7 +236,7 @@ Touchkit.prototype._add = function(img,ops){
     let {iw,ih} = this._getSize(img);
     let iratio = iw / ih;
     let _templateEl = img;
-    let _ele = _.domify(`<div class="mt-child" id="mt-child-${this._childIndex}" data-mt-index="${this._childIndex}"></div>`)[0];
+    let _ele = _.domify(`<div class="mt-child" id="mt-child-${this._childIndex}" data-mt-index="${this._childIndex}"><div class="mt-prevent"></div></div>`)[0];
     let originWidth = this._get('hor',ops.width),
         originHeight = originWidth / iratio;
     let spaceX = (ops.pos.scale - 1) * originWidth/2,
@@ -317,11 +322,12 @@ Touchkit.prototype.exportImage = function(cbk,cropOps){
     if(this._childs.background){
         let bg = this._childs.background;
         ratio = bg.ops.ratio;
+        let image = bg.el.querySelector('.mt-image');
         let bgPos = _.xRatio(_.getPos(bg.el),ratio);
         addChilds.push({
-            image:bg.el,
+            image:image,
             options:{
-                width:bg.el.width * ratio,
+                width:image.width * ratio,
                 pos:bgPos,
             },
         });
@@ -398,20 +404,36 @@ Touchkit.prototype._bind = function(){
         this.mt.on(evName,this[evName].bind(this));
     });
 
+    // 切换子元素；
+    let touchstart;
+    _.delegate(this.el,'touchstart','.mt-background',()=>{
+        touchstart = new Date().getTime();
+    });
+
+    _.delegate(this.el,'touchend','.mt-background',ev=>{
+        if(new Date().getTime() - touchstart > 300 || ev.touches.length)return;
+        this.switch(ev.delegateTarget,false);
+    });
+
+    _.delegate(this.el,'touchend','.mt-crop-box',ev=>{
+        if(ev.touches.length > 0)return;
+        this.switch(ev.delegateTarget);
+    });
+
     // 点击子元素外的区域失去焦点；
     this.el.addEventListener('click',ev=>{
         if(!this._isAdd(ev.target)){
             this.switch(null);
         }
-        // 如果背景为裁剪模式，则切换到操作背景图；
-        if(_.hasClass(ev.target,'mt-background') || _.hasClass(ev.target,'mt-crop-box')){
-            this.switch(ev.target);
-        }
+    });
 
+    _.delegate(this.el,'touchstart','.mt-child',()=>{
+        touchstart = new Date().getTime();
     });
 
     // 切换子元素；
     _.delegate(this.el,'touchend','.mt-child',ev=>{
+        if(new Date().getTime() - touchstart > 300 || ev.touches.length > 0)return;
         let el = ev.delegateTarget,
             _ops = this._getOperatorOps(el),
             _addButton = ((_ops.use.singlePinch || this._ops.use.singlePinch) || (_ops.use.singleRotate || this._ops.use.singleRotate)) ? true : false;
@@ -723,7 +745,7 @@ Touchkit.prototype.getChild = function(index){
 Touchkit.prototype._isAdd = function(el){
     let target = el;
     while(target !== this.el || target.tagName.toLowerCase() == 'body'){
-        if(_.include(target.className,'mt-child')){
+        if(_.include(target.className,'mt-child') || _.include(target.className,'mt-background') || _.include(target.className,'mt-crop-box')){
             return true;
         }
         target = target.parentNode;
@@ -747,12 +769,14 @@ Touchkit.prototype._getSize = function(img){
 };
 
 Touchkit.prototype._insertCss = function(){
+    _.addCssRule('.mt-touch-box','-webkit-user-select: none;');
     _.addCssRule('.mtouch-singleButton','display: none;');
     _.addCssRule('.mt-child.mt-active','z-index: 99;outline:2px solid hsla(0,0%,100%,.5);');
     _.addCssRule('.mt-active .mtouch-singleButton,.mt-active .mt-close-btn','display: inline-block;');
     _.addCssRule('.mt-child','position:absolute;text-align:left;visibility:hidden;');
-    _.addCssRule('.mt-image','width:100%;height:100%;position:absolute;text-align:left;');
-    _.addCssRule('.mt-close-btn',`position:absolute;width:30px;height:30px;top:-15px;right:-15px;background-size:100%;display:none;background-image:url(${removeBtn})`);
+    _.addCssRule('.mt-image','width:100%;height:100%;position:absolute;left:0;top:0;text-align:left;');
+    _.addCssRule('.mt-close-btn',`z-index:999;position:absolute;width:30px;height:30px;top:-15px;right:-15px;background-size:100%;display:none;background-image:url(${removeBtn})`);
     _.addCssRule('.mt-background','position:absolute;left:0;top:0;');
     _.addCssRule('.mt-crop-box','position:absolute;left:5px;top:5px;width:90%;height:90%;border:2px dashed #996699;box-sizing:border-box;z-index:20;');
+    _.addCssRule('.mt-prevent','width:100%;height:100%;position:absolute;left:0;top:0;z-index:99;');
 };

@@ -517,7 +517,7 @@ MTouch.prototype.off = function (evName, handler) {
 };
 
 MTouch.prototype._css = function () {
-    _.addCssRule('.mtouch-singleButton', 'position:absolute;right:-15px;bottom: -15px;width:30px;height: 30px;background-size: 100% 100%;background-image:url(' + base64 + ');');
+    _.addCssRule('.mtouch-singleButton', 'z-index:9999;position:absolute;right:-15px;bottom: -15px;width:30px;height: 30px;background-size: 100% 100%;background-image:url(' + base64 + ');');
 };
 
 var _typeof2$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -1569,6 +1569,8 @@ function Touchkit(ops) {
 
     // 手势容器；
     this.el = _$2.getEl(this._ops.el);
+
+    _$2.addClass(this.el, 'mt-touch-box');
     // 容器宽高，优先使用clientWidth，避免边框等因素的影响；
     this.elStatus = {
         width: this.el.clientWidth || this.el.offsetWidth,
@@ -1644,8 +1646,11 @@ Touchkit.prototype.background = function (ops) {
             minY = 0;
         var ratio = void 0;
 
+        var template = _$2.domify('<div class="mt-background" data-mt-index="background" data-mt-bg-type=' + _ops.type + '><div class="mt-prevent"></div></div>')[0];
+
         // 初始化背景图属性；
-        _$2.addClass(img, 'mt-background').data(img, 'mt-index', 'background').data(img, 'mt-bg-type', _ops.type);
+        _$2.addClass(img, 'mt-image');
+        template.appendChild(img);
 
         if (_ops.type == 'contain') {
             if (iratio > pratio) {
@@ -1694,7 +1699,7 @@ Touchkit.prototype.background = function (ops) {
                 };
             }
         }
-        _$2.setStyle(img, {
+        _$2.setStyle(template, {
             width: width + 'px',
             height: height + 'px',
             transform: 'translate(' + left + 'px,' + top + 'px)',
@@ -1703,13 +1708,13 @@ Touchkit.prototype.background = function (ops) {
 
         _ops.pos = { width: width, height: height, left: left, top: top };
 
-        _this2.el.appendChild(img);
+        _this2.el.appendChild(template);
 
         // 记录背景图参数；
         _ops.ratio = ratio;
 
         _this2._childs.background = {
-            el: img,
+            el: template,
             ops: _ops,
             type: 'background'
         };
@@ -1773,7 +1778,7 @@ Touchkit.prototype._add = function (img, ops) {
 
     var iratio = iw / ih;
     var _templateEl = img;
-    var _ele = _$2.domify('<div class="mt-child" id="mt-child-' + this._childIndex + '" data-mt-index="' + this._childIndex + '"></div>')[0];
+    var _ele = _$2.domify('<div class="mt-child" id="mt-child-' + this._childIndex + '" data-mt-index="' + this._childIndex + '"><div class="mt-prevent"></div></div>')[0];
     var originWidth = this._get('hor', ops.width),
         originHeight = originWidth / iratio;
     var spaceX = (ops.pos.scale - 1) * originWidth / 2,
@@ -1861,11 +1866,12 @@ Touchkit.prototype.exportImage = function (cbk, cropOps) {
     if (this._childs.background) {
         var bg = this._childs.background;
         ratio = bg.ops.ratio;
+        var image = bg.el.querySelector('.mt-image');
         var bgPos = _$2.xRatio(_$2.getPos(bg.el), ratio);
         addChilds.push({
-            image: bg.el,
+            image: image,
             options: {
-                width: bg.el.width * ratio,
+                width: image.width * ratio,
                 pos: bgPos
             }
         });
@@ -1944,19 +1950,36 @@ Touchkit.prototype._bind = function () {
         _this5.mt.on(evName, _this5[evName].bind(_this5));
     });
 
+    // 切换子元素；
+    var touchstart = void 0;
+    _$2.delegate(this.el, 'touchstart', '.mt-background', function () {
+        touchstart = new Date().getTime();
+    });
+
+    _$2.delegate(this.el, 'touchend', '.mt-background', function (ev) {
+        if (new Date().getTime() - touchstart > 300 || ev.touches.length) return;
+        _this5.switch(ev.delegateTarget, false);
+    });
+
+    _$2.delegate(this.el, 'touchend', '.mt-crop-box', function (ev) {
+        if (ev.touches.length > 0) return;
+        _this5.switch(ev.delegateTarget);
+    });
+
     // 点击子元素外的区域失去焦点；
     this.el.addEventListener('click', function (ev) {
         if (!_this5._isAdd(ev.target)) {
             _this5.switch(null);
         }
-        // 如果背景为裁剪模式，则切换到操作背景图；
-        if (_$2.hasClass(ev.target, 'mt-background') || _$2.hasClass(ev.target, 'mt-crop-box')) {
-            _this5.switch(ev.target);
-        }
+    });
+
+    _$2.delegate(this.el, 'touchstart', '.mt-child', function () {
+        touchstart = new Date().getTime();
     });
 
     // 切换子元素；
     _$2.delegate(this.el, 'touchend', '.mt-child', function (ev) {
+        if (new Date().getTime() - touchstart > 300 || ev.touches.length > 0) return;
         var el = ev.delegateTarget,
             _ops = _this5._getOperatorOps(el),
             _addButton = _ops.use.singlePinch || _this5._ops.use.singlePinch || _ops.use.singleRotate || _this5._ops.use.singleRotate ? true : false;
@@ -2277,7 +2300,7 @@ Touchkit.prototype.getChild = function (index) {
 Touchkit.prototype._isAdd = function (el) {
     var target = el;
     while (target !== this.el || target.tagName.toLowerCase() == 'body') {
-        if (_$2.include(target.className, 'mt-child')) {
+        if (_$2.include(target.className, 'mt-child') || _$2.include(target.className, 'mt-background') || _$2.include(target.className, 'mt-crop-box')) {
             return true;
         }
         target = target.parentNode;
@@ -2302,14 +2325,16 @@ Touchkit.prototype._getSize = function (img) {
 };
 
 Touchkit.prototype._insertCss = function () {
+    _$2.addCssRule('.mt-touch-box', '-webkit-user-select: none;');
     _$2.addCssRule('.mtouch-singleButton', 'display: none;');
     _$2.addCssRule('.mt-child.mt-active', 'z-index: 99;outline:2px solid hsla(0,0%,100%,.5);');
     _$2.addCssRule('.mt-active .mtouch-singleButton,.mt-active .mt-close-btn', 'display: inline-block;');
     _$2.addCssRule('.mt-child', 'position:absolute;text-align:left;visibility:hidden;');
-    _$2.addCssRule('.mt-image', 'width:100%;height:100%;position:absolute;text-align:left;');
-    _$2.addCssRule('.mt-close-btn', 'position:absolute;width:30px;height:30px;top:-15px;right:-15px;background-size:100%;display:none;background-image:url(' + base64$1 + ')');
+    _$2.addCssRule('.mt-image', 'width:100%;height:100%;position:absolute;left:0;top:0;text-align:left;');
+    _$2.addCssRule('.mt-close-btn', 'z-index:999;position:absolute;width:30px;height:30px;top:-15px;right:-15px;background-size:100%;display:none;background-image:url(' + base64$1 + ')');
     _$2.addCssRule('.mt-background', 'position:absolute;left:0;top:0;');
     _$2.addCssRule('.mt-crop-box', 'position:absolute;left:5px;top:5px;width:90%;height:90%;border:2px dashed #996699;box-sizing:border-box;z-index:20;');
+    _$2.addCssRule('.mt-prevent', 'width:100%;height:100%;position:absolute;left:0;top:0;z-index:99;');
 };
 
 return Touchkit;
