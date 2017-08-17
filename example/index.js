@@ -45,7 +45,7 @@ Tk.background({
     use:'all',
     limit:true,
     pos:{
-        x:0,
+        x:'0px',
         y:0,
         scale:1,
         rotate:0,
@@ -55,8 +55,10 @@ Tk.background({
 });
 
 $('.js-cropBox').on('click',function(){
-    Tk.cropBox();
+    // Tk.cropBox();
     // Tk.clear();
+    console.log(Tk.getChild('background'));
+    console.log(Tk._childs);
 });
 
 $('.js-export').on('click',function(){

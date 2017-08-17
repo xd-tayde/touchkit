@@ -164,6 +164,8 @@ Touchkit.prototype.background = function(ops){
             webkitTransform:`translate(${left}px,${top}px)`,
         });
 
+        _ops.pos = {width,height,left,top};
+
         this.el.appendChild(img);
 
         // 记录背景图参数；
@@ -246,6 +248,14 @@ Touchkit.prototype._add = function(img,ops){
         _ele.appendChild(_.domify(`<div class="mt-close-btn"></div>`)[0]);
     }
     this.el.appendChild(_ele);
+
+    ops.pos ={
+        x:this._get('hor',ops.pos.x) + spaceX,
+        y:this._get('ver',ops.pos.y) + spaceY,
+        scale:ops.pos.scale,
+        rotate:ops.pos.rotate,
+    };
+
     // 记录数据；
     this._childs[this._childIndex] = {
         el:_ele,
@@ -261,15 +271,12 @@ Touchkit.prototype._add = function(img,ops){
     this.switch(_ele,addButton);
 
     // space 为因为缩放造成的偏移误差；
-    this._setTransform(_ele,{
-        x:this._get('hor',ops.pos.x) + spaceX,
-        y:this._get('ver',ops.pos.y) + spaceY,
-        scale:ops.pos.scale,
-        rotate:ops.pos.rotate,
-    });
+    this._setTransform(_ele,ops.pos);
+
     _.setStyle(_ele,{
         visibility:'visible',
     });
+
     this._childIndex++;
     ops.success(this);
 };
@@ -404,7 +411,7 @@ Touchkit.prototype._bind = function(){
     });
 
     // 切换子元素；
-    _.delegate(this.el,'click','.mt-child',ev=>{
+    _.delegate(this.el,'touchend','.mt-child',ev=>{
         let el = ev.delegateTarget,
             _ops = this._getOperatorOps(el),
             _addButton = ((_ops.use.singlePinch || this._ops.use.singlePinch) || (_ops.use.singleRotate || this._ops.use.singleRotate)) ? true : false;
@@ -424,6 +431,7 @@ Touchkit.prototype._bind = function(){
             this._zIndexBox.removeIndex(_child.id);
         }
         _.remove(_child);
+        this._childs[index] = null;
     });
 };
 
@@ -645,7 +653,6 @@ Touchkit.prototype.clear = function(){
         }
     });
     this._init(this._childs);
-    console.log(this);
 };
 
 // 重置所有状态到初始化阶段；

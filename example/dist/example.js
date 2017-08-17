@@ -1707,6 +1707,8 @@ Touchkit.prototype.background = function (ops) {
             webkitTransform: 'translate(' + left + 'px,' + top + 'px)'
         });
 
+        _ops.pos = { width: width, height: height, left: left, top: top };
+
         _this2.el.appendChild(img);
 
         // 记录背景图参数；
@@ -1794,6 +1796,14 @@ Touchkit.prototype._add = function (img, ops) {
         _ele.appendChild(_$2.domify('<div class="mt-close-btn"></div>')[0]);
     }
     this.el.appendChild(_ele);
+
+    ops.pos = {
+        x: this._get('hor', ops.pos.x) + spaceX,
+        y: this._get('ver', ops.pos.y) + spaceY,
+        scale: ops.pos.scale,
+        rotate: ops.pos.rotate
+    };
+
     // 记录数据；
     this._childs[this._childIndex] = {
         el: _ele,
@@ -1809,15 +1819,12 @@ Touchkit.prototype._add = function (img, ops) {
     this.switch(_ele, addButton);
 
     // space 为因为缩放造成的偏移误差；
-    this._setTransform(_ele, {
-        x: this._get('hor', ops.pos.x) + spaceX,
-        y: this._get('ver', ops.pos.y) + spaceY,
-        scale: ops.pos.scale,
-        rotate: ops.pos.rotate
-    });
+    this._setTransform(_ele, ops.pos);
+
     _$2.setStyle(_ele, {
         visibility: 'visible'
     });
+
     this._childIndex++;
     ops.success(this);
 };
@@ -1955,7 +1962,7 @@ Touchkit.prototype._bind = function () {
     });
 
     // 切换子元素；
-    _$2.delegate(this.el, 'click', '.mt-child', function (ev) {
+    _$2.delegate(this.el, 'touchend', '.mt-child', function (ev) {
         var el = ev.delegateTarget,
             _ops = _this5._getOperatorOps(el),
             _addButton = _ops.use.singlePinch || _this5._ops.use.singlePinch || _ops.use.singleRotate || _this5._ops.use.singleRotate ? true : false;
@@ -1975,6 +1982,7 @@ Touchkit.prototype._bind = function () {
             _this5._zIndexBox.removeIndex(_child.id);
         }
         _$2.remove(_child);
+        _this5._childs[index] = null;
     });
 };
 
@@ -2203,7 +2211,6 @@ Touchkit.prototype.clear = function () {
         }
     });
     this._init(this._childs);
-    console.log(this);
 };
 
 // 重置所有状态到初始化阶段；
@@ -2356,7 +2363,7 @@ Tk.background({
     use: 'all',
     limit: true,
     pos: {
-        x: 0,
+        x: '0px',
         y: 0,
         scale: 1,
         rotate: 0
@@ -2366,8 +2373,10 @@ Tk.background({
 });
 
 $('.js-cropBox').on('click', function () {
-    Tk.cropBox();
+    // Tk.cropBox();
     // Tk.clear();
+    console.log(Tk.getChild('background'));
+    console.log(Tk._childs);
 });
 
 $('.js-export').on('click', function () {
