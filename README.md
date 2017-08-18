@@ -10,11 +10,21 @@
 
 This toolkit is built on `mtouch.js` and `mcanvas.js`. Use it, you can build a gesture project quickly and get a image automatically. concerned less and do more!
 
+## Installation
+
+- You can download the latest version from the [GitHub](https://github.com/xd-tayde/touchkit/blob/master/dist/touchkit.min.js)
+- use a npm [CDN](https://unpkg.com/touchkit/dist/mcanvas.min.js).
+- Or you can install via npm:
+
+```js
+npm install touchkit --save
+```
+
 ## Basic Usage
 
-The idea of touchkit is that init create a touch box firstly, and then use `tk.add()` add the background and touch-element into the touch box, finally, export a composite image by `tk.exportImage()`. The image is what you see in touch box.
+The idea of touchkit is that init create a touch box firstly, and then use `tk.background()` add the background and use `tk.add()` add the touch-element into the touch box, finally, export a composite image by `tk.exportImage()`. The image is what you see in touch box.
 
-the simple example, see the document for more details
+the simple example, see the document for more details.
 
 ```js
 // init create touch box
@@ -50,13 +60,7 @@ new Touchkit('.js-par')
     width:100,
     limit:true,
     close:true,
-    use:{
-        drag:true,
-        pinch:true,
-        rotate:true,
-        singlePinch:true,
-        singleRotate:true,
-    },
+    use:'all',
     pos:{
         x:0,
         y:0,

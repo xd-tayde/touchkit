@@ -50,16 +50,9 @@ export default function Touchkit(ops) {
         height:this.el.clientHeight || this.el.offsetHeight,
     };
 
-    this._cropBox = false;
-
-    this._insertCss();
-
-    this._init();
-
     // 初始化mtouch；
     this.mt = MT(this.el);
-
-    this._bind();
+    this._insertCss()._init()._bind();
 
 }
 
@@ -67,6 +60,8 @@ Touchkit.prototype._init = function(childs = {}){
     // 操作元素
     this.operator = null;
     this.operatorStatus = null;
+
+    this._cropBox = false;
 
     this.transform = null;
     this.freezed = false;
@@ -76,6 +71,7 @@ Touchkit.prototype._init = function(childs = {}){
     this._activeChild = null;
     // 管理子元素之间的zindex层级关系；
     this._zIndexBox = new ZIndex();
+    return this;
 };
 
 Touchkit.prototype.background = function(ops){
@@ -239,6 +235,7 @@ Touchkit.prototype._add = function(img,ops){
     let _ele = _.domify(`<div class="mt-child" id="mt-child-${this._childIndex}" data-mt-index="${this._childIndex}"><div class="mt-prevent"></div></div>`)[0];
     let originWidth = this._get('hor',ops.width),
         originHeight = originWidth / iratio;
+    // space 为因为缩放造成的偏移误差；
     let spaceX = (ops.pos.scale - 1) * originWidth/2,
         spaceY = (ops.pos.scale - 1) * originHeight/2;
     _.setStyle(_ele,{
@@ -275,8 +272,7 @@ Touchkit.prototype._add = function(img,ops){
     // 切换operator到新添加的元素上；
     this.switch(_ele,addButton);
 
-    // space 为因为缩放造成的偏移误差；
-    this._setTransform(_ele,ops.pos);
+    this._setTransform('all', _ele , ops.pos);
 
     _.setStyle(_ele,{
         visibility:'visible',
@@ -405,13 +401,13 @@ Touchkit.prototype._bind = function(){
     });
 
     // 切换子元素；
-    let touchstart;
+    let bgStart,childStart;
     _.delegate(this.el,'touchstart','.mt-background',()=>{
-        touchstart = new Date().getTime();
+        bgStart = new Date().getTime();
     });
 
     _.delegate(this.el,'touchend','.mt-background',ev=>{
-        if(new Date().getTime() - touchstart > 300 || ev.touches.length)return;
+        if(new Date().getTime() - bgStart > 300 || ev.touches.length)return;
         this.switch(ev.delegateTarget,false);
     });
 
@@ -428,12 +424,12 @@ Touchkit.prototype._bind = function(){
     });
 
     _.delegate(this.el,'touchstart','.mt-child',()=>{
-        touchstart = new Date().getTime();
+        childStart = new Date().getTime();
     });
 
     // 切换子元素；
     _.delegate(this.el,'touchend','.mt-child',ev=>{
-        if(new Date().getTime() - touchstart > 300 || ev.touches.length > 0)return;
+        if(new Date().getTime() - childStart > 300 || ev.touches.length > 0)return;
         let el = ev.delegateTarget,
             _ops = this._getOperatorOps(el),
             _addButton = ((_ops.use.singlePinch || this._ops.use.singlePinch) || (_ops.use.singleRotate || this._ops.use.singleRotate)) ? true : false;
@@ -455,6 +451,8 @@ Touchkit.prototype._bind = function(){
         _.remove(_child);
         this._childs[index] = null;
     });
+
+    return this;
 };
 
 Touchkit.prototype.touchstart = function(ev){
@@ -473,7 +471,7 @@ Touchkit.prototype.drag = function(ev){
             if(ops.use.drag || this._ops.use.drag){
                 this.transform.x += ev.delta.deltaX;
                 this.transform.y += ev.delta.deltaY;
-                this._setTransform();
+                this._setTransform('drag');
             }
         }
         this._ops.event.drag(ev);
@@ -486,7 +484,7 @@ Touchkit.prototype.pinch = function(ev){
             let ops = this._getOperatorOps();
             if(ops.use.pinch || this._ops.use.pinch){
                 this.transform.scale *= ev.delta.scale;
-                this._setTransform();
+                this._setTransform('pinch');
             }
         }
         this._ops.event.pinch(ev);
@@ -498,7 +496,7 @@ Touchkit.prototype.rotate = function(ev){
             let ops = this._getOperatorOps();
             if(ops.use.rotate || this._ops.use.rotate){
                 this.transform.rotate += ev.delta.rotate;
-                this._setTransform();
+                this._setTransform('rotate');
             }
         }
         this._ops.event.rotate(ev);
@@ -525,7 +523,7 @@ Touchkit.prototype.singlePinch = function(ev){
             }else{
                 if(ops.use.singlePinch || this._ops.use.singlePinch){
                     this.transform.scale *= ev.delta.scale;
-                    this._setTransform();
+                    this._setTransform('pinch');
                 }
             }
         }
@@ -538,16 +536,15 @@ Touchkit.prototype.singleRotate = function(ev){
             let ops = this._getOperatorOps();
             if(ops.use.singleRotate || this._ops.use.singleRotate){
                 this.transform.rotate += ev.delta.rotate;
-                this._setTransform();
+                this._setTransform('rotate');
             }
         }
         this._ops.event.singleRotate(ev);
     }
 };
-Touchkit.prototype._setTransform = function(el = this.operator, transform = this.transform) {
+Touchkit.prototype._setTransform = function(type, el = this.operator, transform = this.transform) {
     let trans = JSON.parse(JSON.stringify(transform));
     let ops = this._getOperatorOps();
-
     let defaulLimit = (this._ops.limit && typeof this._ops.limit == 'object') ? _.extend({
         x:0.5,
         y:0.5,
@@ -559,26 +556,19 @@ Touchkit.prototype._setTransform = function(el = this.operator, transform = this
         maxScale:3,
         minScale:0.4,
     };
-
     let _limit = (ops.limit && ops.limit !== true) ? _.extend(defaulLimit,ops.limit) : defaulLimit;
+
     if(ops.limit || this._ops.limit){
         trans = this._limitOperator(trans,_limit);
     }
-    if(ops.use.singlePinch || this._ops.use.singlePinch){
+    if((ops.use.singlePinch || this._ops.use.singlePinch) && (type == 'all' || type == 'pinch')){
         let singlePinchBtn = el.querySelector(`.mtouch-singleButton`);
         _.setStyle(singlePinchBtn,{
             transform:`scale(${1/trans.scale})`,
             webkitTransform:`scale(${1/trans.scale})`,
         });
     }
-    if(ops.use.singleRotate || this._ops.use.singleRotate){
-        let singleRotateBtn = el.querySelector(`.mtouch-singleButton`);
-        _.setStyle(singleRotateBtn,{
-            transform:`scale(${1/trans.scale})`,
-            webkitTransform:`scale(${1/trans.scale})`,
-        });
-    }
-    if(ops.close || this._ops.close){
+    if((ops.close || this._ops.close) && (type == 'all' || type == 'pinch')){
         let closeBtn = el.querySelector(`.mt-close-btn`);
         _.setStyle(closeBtn,{
             transform:`scale(${1/trans.scale})`,
@@ -592,24 +582,25 @@ Touchkit.prototype._setTransform = function(el = this.operator, transform = this
 Touchkit.prototype._limitOperator = function(transform,limit) {
     // 实时获取操作元素的状态；
     let {minScale, maxScale} = limit;
+    let operatorStatus,spaceX,spaceY,boundaryX,boundaryY,minX,minY,maxX,maxY;
     if (minScale && transform.scale < minScale){
         transform.scale = minScale;
     }
     if (maxScale && transform.scale > maxScale){
         transform.scale = maxScale;
     }
-    let operatorStatus = _.getOffset(this.operator);
+    operatorStatus = _.getOffset(this.operator);
     // 因缩放产生的间隔；
-    let spaceX = operatorStatus.width * (transform.scale - 1) / 2;
-    let spaceY = operatorStatus.height * (transform.scale - 1) / 2;
+    spaceX = operatorStatus.width * (transform.scale - 1) / 2;
+    spaceY = operatorStatus.height * (transform.scale - 1) / 2;
     // 参数设置的边界值；
-    let boundaryX = operatorStatus.width * transform.scale  * (limit.x);
-    let boundaryY = operatorStatus.height * transform.scale * (limit.y);
+    boundaryX = operatorStatus.width * transform.scale  * (limit.x);
+    boundaryY = operatorStatus.height * transform.scale * (limit.y);
     // 4个边界状态；
-    let minX = spaceX - boundaryX;
-    let minY = spaceX - boundaryY;
-    let maxX = this.elStatus.width - operatorStatus.width * transform.scale + spaceX + boundaryX;
-    let maxY = this.elStatus.height - operatorStatus.height * transform.scale + spaceY + boundaryY;
+    minX = spaceX - boundaryX;
+    minY = spaceX - boundaryY;
+    maxX = this.elStatus.width - operatorStatus.width * transform.scale + spaceX + boundaryX;
+    maxY = this.elStatus.height - operatorStatus.height * transform.scale + spaceY + boundaryY;
 
     if(limit.x || limit.x == 0){
         if(transform.x >= maxX)transform.x = maxX;
@@ -623,9 +614,7 @@ Touchkit.prototype._limitOperator = function(transform,limit) {
 };
 Touchkit.prototype.switch = function(el,addButton){
     if(!this.mt || this.freezed)return;
-    if(el){
-        el = _.getEl(el);
-    }
+    if(el)el = _.getEl(el);
     _.forin(this._childs,(k,v)=>{
         if(v){
             _.removeClass(v.el,'mt-active');
@@ -635,7 +624,6 @@ Touchkit.prototype.switch = function(el,addButton){
     this.mt.switch(el,addButton);
     // 切换operator;
     this.operator = el;
-
     if(el){
         _.addClass(el,'mt-active');
         this._activeChild = el;
@@ -675,6 +663,7 @@ Touchkit.prototype.clear = function(){
         }
     });
     this._init(this._childs);
+    return this;
 };
 
 // 重置所有状态到初始化阶段；
@@ -685,6 +674,7 @@ Touchkit.prototype.reset = function(){
         }
     });
     this._init();
+    return this;
 };
 
 // 销毁，但保持原有样式，失去焦点与事件绑定；
@@ -779,4 +769,5 @@ Touchkit.prototype._insertCss = function(){
     _.addCssRule('.mt-background','position:absolute;left:0;top:0;');
     _.addCssRule('.mt-crop-box','position:absolute;left:5px;top:5px;width:90%;height:90%;border:2px dashed #996699;box-sizing:border-box;z-index:20;');
     _.addCssRule('.mt-prevent','width:100%;height:100%;position:absolute;left:0;top:0;z-index:99;');
+    return this;
 };

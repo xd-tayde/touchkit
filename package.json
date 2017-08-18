@@ -1,6 +1,6 @@
 {
   "name": "touchkit",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "a touch kit based on mtouch,it make you create a gesture app more quickly and simply",
   "keywords": [
     "touch",
