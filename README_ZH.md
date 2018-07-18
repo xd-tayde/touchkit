@@ -12,6 +12,10 @@
 
 ## Change Log
 
+- 1.2.2(2018.7.18)
+    - 修改文档；
+    - 扩展 Clear 方法；
+
 - 1.2.1(8.18)
     - 修改文档；
     - 优化代码，优化性能；
@@ -309,9 +313,13 @@ params:
 
 添加一个裁剪框，可对结果图进行裁剪；
 
-### 9、`tk.clear()`
+### 9、`tk.clear(index)`
 
-删除所有贴纸；
+参数可选、缺省时为删除所有贴纸；
+
+params：
+
+    index: 元素索引，为 `dom` 上的 `data-mt-index`的值。可在 add、background 方法的成功回调 success 中 tk.operator.dataset.mtIndex 获取当前添加元素的索引;
 
 ### 10、`tk.getChild(index)`
 
