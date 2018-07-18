@@ -655,14 +655,23 @@ Touchkit.prototype.freeze = function(boolean){
     return this;
 };
 
-Touchkit.prototype.clear = function(){
-    _.forin(this._childs,(k,v)=>{
-        if(v && v.type == 'element'){
-            _.remove(v.el);
-            this._childs[k] = null;
+Touchkit.prototype.clear = function(index = null){
+    if (index !== null) {
+        try {
+            _.remove(this.getChild(index).el);
+            this._childs[index] = null;    
+        } catch (error) {
+            console.error('Can not find this el or has been deleted!');
         }
-    });
-    this._init(this._childs);
+    } else {
+        _.forin(this._childs,(k,v)=>{
+            if(v && v.type == 'element'){
+                _.remove(v.el);
+                this._childs[k] = null;
+            }
+        });
+        this._init(this._childs);
+    }
     return this;
 };
 
