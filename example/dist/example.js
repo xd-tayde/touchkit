@@ -2218,13 +2218,24 @@ Touchkit.prototype.freeze = function (boolean) {
 Touchkit.prototype.clear = function () {
     var _this6 = this;
 
-    _$2.forin(this._childs, function (k, v) {
-        if (v && v.type == 'element') {
-            _$2.remove(v.el);
-            _this6._childs[k] = null;
+    var index = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+    if (index !== null) {
+        try {
+            _$2.remove(this.getChild(index).el);
+            this._childs[index] = null;
+        } catch (error) {
+            console.error('Can not find this el or has been deleted!');
         }
-    });
-    this._init(this._childs);
+    } else {
+        _$2.forin(this._childs, function (k, v) {
+            if (v && v.type == 'element') {
+                _$2.remove(v.el);
+                _this6._childs[k] = null;
+            }
+        });
+        this._init(this._childs);
+    }
     return this;
 };
 

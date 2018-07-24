@@ -1,6 +1,6 @@
 {
   "name": "touchkit",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "a touch kit based on mtouch,it make you create a gesture app more quickly and simply",
   "keywords": [
     "touch",
@@ -23,7 +23,7 @@
     "publish": "rm -rf dist && npm run dev && npm run prod",
     "lint": "eslint src"
   },
-  "repository": {
+  "repository": { 
     "url": "https://github.com/xd-tayde/touchkit",
     "type": "git"
   },
